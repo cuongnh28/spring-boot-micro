@@ -1,0 +1,37 @@
+#config-server:
+#  address: your address
+#  port: 443
+#
+#spring:
+#  application:
+#    name: your-app
+#  cloud:
+#    config:
+#      fail-fast: true
+#      uri: https://${config-server.address}:${config-server.port}
+#      username: ${CLOUD_CONFIG_USERNAME}
+#      password: ${CLOUD_CONFIG_PASSWORD}
+#      profile: local
+#      label: local
+#
+#application:
+#  internal:
+#    scheduled-tasks:
+#      pqm-token:
+#        fixed-delay: 43200000
+#      payment-notification:
+#        fixed-delay: 5000
+#        initial-delay: 30000
+#
+#feign:
+#  httpclient:
+#    disableSslValidation: true
+#    enabled: false
+#  okhttp:
+#    enabled: true
+#
+#server:
+#  port : 8081
+#
+#
+#

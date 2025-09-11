@@ -1,0 +1,162 @@
+version: '3.7'
+services:
+  account-service-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: account-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    volumes:
+      - account-postgres-data:/var/lib/postgresql/data
+
+  account-service-app:
+    build:
+      context: .
+      dockerfile: account-service/Dockerfile
+    ports:
+      - "8088:8088"
+      - "5005:5005"
+    depends_on:
+      account-service-db:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://account-service-db:5432/account-service
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: '{{.Name}}'
+
+  product-service-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: product-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    volumes:
+      - product-postgres-data:/var/lib/postgresql/data
+
+  product-service-app:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    ports:
+      - "8089:8089"
+      - "5006:5006"
+    depends_on:
+      product-service-db:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://product-service-db:5432/product-service
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5006
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: '{{.Name}}'
+
+  fluentd:
+    build: ./fluentd
+    container_name: fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    links: # Sends incoming logs to the elasticsearch container.
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+    ports: # Exposes the port 24224 on both TCP and UDP protocol for log aggregation
+      - 24224:24224
+      - 24224:24224/udp
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+    environment:
+      - discovery.type=single-node # Runs as a single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=kibana_password
+    volumes:
+      - esdata:/usr/share/elasticsearch/data2
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    container_name: kibana
+    links: # Links kibana service to the elasticsearch container
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5601:5601
+    environment: # Defined host configuration
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=kibana_password
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    restart: unless-stopped
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    healthcheck:
+      test: "echo stat | nc localhost $ZOOKEEPER_CLIENT_PORT"
+      start_period: 20s
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.3.2
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_ADVERTISED_HOST_NAME:
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9092" ]
+      start_period: 20s
+#    add this config if wanna save kafka log whenever restart docker.
+#    volumes:
+#      - kafka-data:/var/lib/kafka/data
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - 8085:9000
+    environment:
+      KAFKA_BROKERCONNECT: kafka:29092
+    healthcheck:
+      test: "curl -f kafdrop:9000/actuator/health || exit 1"
+      start_period: 30s
+
+volumes:
+  account-postgres-data:
+  product-postgres-data:
+  esdata:
+#  kafka-data:

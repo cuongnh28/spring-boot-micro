@@ -1,0 +1,53 @@
+package com.demo.config.feign;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.demo.exception.HttpException;
+import com.demo.exception.FeignResponseException;
+import com.demo.exception.model.ApiError;
+import feign.Response;
+import feign.codec.ErrorDecoder;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.HttpStatus;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+@Slf4j
+public class FeignErrorDecoder implements ErrorDecoder {
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Override
+    public Exception decode(String methodKey, Response response) {
+        ApiError errorModel;
+        InputStream inputStream;
+        String responseBody;
+        HttpStatus responseStatus = HttpStatus.valueOf(response.status());
+
+        if (response.body() == null) {
+            return new HttpException(responseStatus, List.of(responseStatus.getReasonPhrase()), null);
+        }
+
+        try {
+            inputStream = response.body().asInputStream();
+            responseBody = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
+            log.info("====UlErrorDecoder.decode====");
+            log.info(response.request().url());
+            log.info(responseBody);
+        } catch (IOException e) {
+            return new HttpException(responseStatus, List.of(responseStatus.getReasonPhrase()), null);
+        }
+        try {
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            errorModel = mapper.readValue(responseBody, ApiError.class);
+        } catch (JsonProcessingException e) {
+            return new HttpException(responseStatus, List.of(responseBody), null);
+        }
+
+        return new FeignResponseException(errorModel);
+    }
+}

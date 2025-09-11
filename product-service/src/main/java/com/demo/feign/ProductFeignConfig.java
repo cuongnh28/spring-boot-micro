@@ -1,0 +1,62 @@
+package com.demo.feign;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Client;
+import feign.Feign;
+import feign.Logger;
+import feign.QueryMapEncoder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.Map;
+
+import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
+
+@Configuration // Add this annotation when you want to apply for all project. And if not, just manual import at the feign client class.
+public class ProductFeignConfig {
+
+    @Bean
+    public Client getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
+                .build();
+
+        return new Client.Default(sslContext.getSocketFactory(), NoopHostnameVerifier.INSTANCE);
+    }
+
+    @Bean
+    public CustomFeignRequestLogging customFeignRequestLogging(ApplicationEventPublisher publisher) {
+        return new CustomFeignRequestLogging(publisher);
+    }
+
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.BASIC;
+    }
+
+    @Bean
+    public QueryMapEncoder queryMapEncoder(ObjectMapper objectMapper) {
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        return object -> objectMapper.convertValue(object, new TypeReference<Map<String, Object>>() {});
+    }
+
+    @Bean
+    @Scope(SCOPE_PROTOTYPE)
+    public Feign.Builder feignBuilder(QueryMapEncoder queryMapEncoder) {
+        return Feign.builder().queryMapEncoder(queryMapEncoder);
+    }
+
+}
