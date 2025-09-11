@@ -1,8 +1,9 @@
 package com.demo.controller;
 
-import com.demo.model.User;
+import com.demo.payload.response.UserProfile;
 import com.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -14,8 +15,14 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/{id}")
-    public User getUserBy(@PathVariable("id") long id) {
+    public UserProfile getUserBy(@PathVariable("id") long id) {
         return userService.getUserById(id);
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    public UserProfile getMe() {
+        return userService.getCurrentUserProfile();
     }
 
 }

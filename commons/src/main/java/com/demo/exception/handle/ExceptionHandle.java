@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -64,6 +66,20 @@ public class ExceptionHandle {
         FeignResponseException customEx = (FeignResponseException) ex;
         ApiError errorModel = customEx.getErrorModel();
         HttpStatus httpStatus = customEx.getHttpStatus();
+        return new ResponseEntity<>(errorModel, header(), httpStatus);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<Object> handleAccessDenied(Exception ex, WebRequest request) {
+        HttpStatus httpStatus = HttpStatus.FORBIDDEN;
+        ApiError errorModel = new ApiError(httpStatus.value(), "Access Denied");
+        return new ResponseEntity<>(errorModel, header(), httpStatus);
+    }
+
+    @ExceptionHandler({AuthenticationException.class})
+    public ResponseEntity<Object> handleAuthentication(Exception ex, WebRequest request) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        ApiError errorModel = new ApiError(httpStatus.value(), "Unauthorized");
         return new ResponseEntity<>(errorModel, header(), httpStatus);
     }
 

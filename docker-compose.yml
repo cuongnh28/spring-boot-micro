@@ -57,7 +57,7 @@ services:
     environment:
       DB_URL: jdbc:postgresql://product-service-db:5432/product-service
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5006
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006
     links:
       - fluentd
     logging:

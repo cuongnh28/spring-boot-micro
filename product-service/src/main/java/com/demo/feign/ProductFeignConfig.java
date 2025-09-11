@@ -24,7 +24,7 @@ import java.util.Map;
 
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
-@Configuration // Add this annotation when you want to apply for all project. And if not, just manual import at the feign client class.
+//@Configuration // Disabled to avoid duplicate bean names; using CommonFeignConfig instead
 public class ProductFeignConfig {
 
     @Bean
@@ -42,10 +42,10 @@ public class ProductFeignConfig {
         return new CustomFeignRequestLogging(publisher);
     }
 
-    @Bean
-    Logger.Level feignLoggerLevel() {
-        return Logger.Level.BASIC;
-    }
+//    @Bean
+//    Logger.Level feignLoggerLevel() {
+//        return Logger.Level.BASIC;
+//    }
 
     @Bean
     public QueryMapEncoder queryMapEncoder(ObjectMapper objectMapper) {

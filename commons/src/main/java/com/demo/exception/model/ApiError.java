@@ -7,6 +7,9 @@ public class ApiError {
     private List<String> messages;
     private String errorCode;
 
+    public ApiError() {
+    }
+
     public ApiError(int statusCode, List<String> messages, String errorCode){
         this.statusCode = statusCode;
         this.messages = messages;
@@ -39,5 +42,17 @@ public class ApiError {
 
     public String getErrorCode() {
         return errorCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public void setMessages(List<String> messages) {
+        this.messages = messages;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 }
