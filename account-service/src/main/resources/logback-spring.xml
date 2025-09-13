@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- Console Appender with JSON formatting -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
@@ -15,7 +16,6 @@
                         }
                     </pattern>
                 </pattern>
-
                 <arguments /> <!--or through StructuredArguments -->
                 <stackTrace>
                     <fieldName>stackTrace</fieldName>
@@ -28,9 +28,69 @@
             </providers>
         </encoder>
     </appender>
+
+    <!-- File Appender for persistent logging -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/account-service.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/account-service.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp />
+                <logLevel />
+                <mdc />
+                <context />
+                <loggerName />
+                <pattern>
+                    <pattern>
+                        {
+                        "message": "#tryJson{%message}"
+                        }
+                    </pattern>
+                </pattern>
+                <stackTrace>
+                    <fieldName>stackTrace</fieldName>
+                    <throwableConverter
+                            class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Root logger configuration -->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
     </root>
 
+    <!-- Application specific loggers -->
+    <logger name="com.demo" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!-- Spring Framework loggers -->
     <logger name="org.springframework" level="INFO" />
+    <logger name="org.springframework.web" level="DEBUG" />
+    <logger name="org.springframework.security" level="DEBUG" />
+
+    <!-- Kafka loggers -->
+    <logger name="org.springframework.kafka" level="INFO" />
+    <logger name="org.apache.kafka" level="WARN" />
+
+    <!-- Database loggers -->
+    <logger name="org.hibernate" level="WARN" />
+    <logger name="org.hibernate.SQL" level="DEBUG" />
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+
+    <!-- Reduce noise from other libraries -->
+    <logger name="org.apache.catalina" level="WARN" />
+    <logger name="org.apache.coyote" level="WARN" />
+    <logger name="org.apache.tomcat" level="WARN" />
 </configuration>

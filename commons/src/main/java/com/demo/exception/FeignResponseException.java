@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class FeignResponseException extends ApplicationException {
 
-    private HttpStatus status;
+    private final HttpStatus status;
 
-    private ApiError errorModel;
+    private final transient ApiError errorModel;
 
     public FeignResponseException(ApiError errorModel) {
         this.status = HttpStatus.valueOf(errorModel.getStatusCode());

@@ -1,51 +1,36 @@
 package com.demo.context;
 
 import com.demo.config.thread.CommonContext;
-import com.demo.statics.DeviceType;
-import jakarta.annotation.Nullable;
-import org.apache.commons.lang3.ObjectUtils;
+import com.demo.config.thread.DefaultCommonContext;
+import com.demo.constants.CorrelationConstants;
+import com.demo.util.CorrelationUtils;
+import org.slf4j.MDC;
 import org.springframework.core.NamedInheritableThreadLocal;
 import org.springframework.core.NamedThreadLocal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-/**
- * Holder class to expose the web request in the form of a thread-bound {@link CommonContext} object. The request will be
- * inherited by any child threads spawned by the current thread if the {@code inheritable} flag is set to {@code true}.
- *
- * @author Robin Zhou
- */
+import jakarta.annotation.Nullable;
+
 public abstract class CommonContextHolder {
-
     private static final ThreadLocal<CommonContext> COMMON_CONTEXT_HOLDER =
             new NamedThreadLocal<>("Common context");
-
     private static final ThreadLocal<CommonContext> INHERITABLE_COMMON_CONTEXT_HOLDER =
             new NamedInheritableThreadLocal<>("Common context");
 
-    /**
-     * Reset the CommonContext for the current thread.
-     */
+    private CommonContextHolder() {
+        // Utility class - prevent instantiation
+    }
+
     public static void resetContext() {
         COMMON_CONTEXT_HOLDER.remove();
         INHERITABLE_COMMON_CONTEXT_HOLDER.remove();
     }
 
-    /**
-     * Bind the given CommonContext to the current thread,
-     * <i>not</i> exposing it as inheritable for child threads.
-     *
-     * @param context the CommonContext to expose
-     */
     public static void setContext(@Nullable CommonContext context) {
         setContext(context, false);
     }
 
-    /**
-     * Bind the given CommonContext to the current thread.
-     *
-     * @param context the CommonContext to expose, or {@code null} to reset the thread-bound context
-     * @param inheritable whether to expose the CommonContext as inheritable for child threads (using an
-     *     {@link InheritableThreadLocal})
-     */
     public static void setContext(@Nullable CommonContext context, boolean inheritable) {
         if (context == null) {
             resetContext();
@@ -60,11 +45,6 @@ public abstract class CommonContextHolder {
         }
     }
 
-    /**
-     * Return the CommonContext currently bound to the thread.
-     *
-     * @return the CommonContext currently bound to the thread, or {@code null} if none bound
-     */
     @Nullable
     public static CommonContext getContext() {
         CommonContext context = COMMON_CONTEXT_HOLDER.get();
@@ -74,29 +54,50 @@ public abstract class CommonContextHolder {
         return context;
     }
 
-    public static String getAccountId() {
-        if (ObjectUtils.isEmpty(getContext())) {
-//            throw new BaseException(HttpStatus.UNAUTHORIZED, ResponseCode.COMMON_UNAUTHORIZED);
+    public static String getCorrelationId() {
+        CommonContext context = getContext();
+        if (context != null && context.getCorrelationId() != null) {
+            return context.getCorrelationId();
         }
-        return getContext().getAccountId();
+        return MDC.get(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue());
     }
 
-    public static String getClientId() {
-        if (ObjectUtils.isEmpty(getContext())) {
-//            throw new Exception(HttpStatus.UNAUTHORIZED, ResponseCode.COMMON_UNAUTHORIZED);
+    @Nullable
+    public static String getUserId() {
+        CommonContext context = getContext();
+        if (context != null) {
+            return context.getUserId();
         }
-        return getContext().getClientId();
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() != null) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+                return authentication.getName();
+            }
+        }
+        return null;
     }
 
-    public static DeviceType getDeviceType() {
-        // TODO throw exception if empty
-        return getContext().getDeviceType();
+    @Nullable
+    public static String getUsername() {
+        CommonContext context = getContext();
+        if (context != null) {
+            return context.getUsername();
+        }
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            return authentication.getName();
+        }
+        return null;
     }
 
-    public static String getRequestId() {
-        if (ObjectUtils.isEmpty(getContext())) {
-            return null;
-        }
-        return getContext().getRequestId();
+    public static CommonContext createFromSecurityContext() {
+        String correlationId = CorrelationUtils.currentCorrelationId();
+        String username = getUsername();
+        String userId = getUserId();
+        
+        return new DefaultCommonContext(correlationId, userId, username);
     }
 }

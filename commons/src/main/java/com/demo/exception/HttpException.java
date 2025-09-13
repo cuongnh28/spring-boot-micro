@@ -7,10 +7,9 @@ import java.util.List;
 public class HttpException extends ApplicationException {
     private final HttpStatus httpStatus;
 
-    public HttpException(HttpStatus httpStatus, List<String> messages, String errorCode) {
+    public HttpException(HttpStatus httpStatus, List<String> messages) {
+        super(messages.toArray(new String[0]));
         this.httpStatus = httpStatus;
-        this.setMessages(messages);
-        this.setErrorCode(errorCode);
     }
 
     @Override

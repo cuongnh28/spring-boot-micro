@@ -16,9 +16,6 @@ public class DataInitializer {
             if (roleRepository.findByName(ERole.ROLE_USER).isEmpty()) {
                 roleRepository.save(new Role(null, ERole.ROLE_USER));
             }
-            if (roleRepository.findByName(ERole.ROLE_MODERATOR).isEmpty()) {
-                roleRepository.save(new Role(null, ERole.ROLE_MODERATOR));
-            }
             if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
                 roleRepository.save(new Role(null, ERole.ROLE_ADMIN));
             }

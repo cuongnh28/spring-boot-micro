@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Logger;
-import feign.Request;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.okhttp.OkHttpClient;
@@ -27,30 +27,28 @@ public class CommonFeignConfig {
         return Logger.Level.BASIC;
     }
 
-    @Bean
-    public static Request.Options requestOptions() {
-        // connectTimeoutMillis, readTimeoutMillis, followRedirects
-        return new Request.Options(30000, 30000, true);
-    }
+    // Request.Options bean removed due to deprecation warnings
+    // Timeout configuration can be handled via application properties
+    // Circuit breaker configuration is handled via application.yml
 
     @Bean
     public Decoder feignDecoder() {
-        HttpMessageConverter<Object> jacksonConverter = new MappingJackson2HttpMessageConverter(customObjectMapper());
+        HttpMessageConverter<Object> jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper());
         ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
-        return new ResponseEntityDecoder(new SpringDecoder(objectFactory));
+        return new ResponseEntityDecoder(new SpringDecoder(objectFactory, null));
     }
 
-    private ObjectMapper customObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.registerModule(new JavaTimeModule());
-        return objectMapper;
+    private ObjectMapper objectMapper() {
+        return JsonMapper.builder()
+                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .addModule(new JavaTimeModule())
+                .build();
     }
 
     @Bean
-    public OkHttpClient client() {
+    public OkHttpClient httpClient() {
         return new OkHttpClient();
     }
 

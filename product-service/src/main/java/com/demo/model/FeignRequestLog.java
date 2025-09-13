@@ -9,7 +9,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "feign_request_logs", indexes = {@Index(name = "idx_request_id", columnList = "request_id")})
+@Table(name = "feign_request_logs", indexes = {@Index(name = "idx_correlation_id", columnList = "correlation_id")})
 public class FeignRequestLog {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -50,6 +50,6 @@ public class FeignRequestLog {
     @Column(name = "created_date")
     private Date createdDate;
 
-    @Column(name = "request_id")
-    private String requestId;
+    @Column(name = "correlation_id")
+    private String correlationId;
 }

@@ -11,7 +11,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
-import com.demo.util.RequestUtils;
+import com.demo.constants.CorrelationConstants;
+import com.demo.util.CorrelationUtils;
 
 import java.io.IOException;
 
@@ -31,26 +32,26 @@ public class MDCLoggerFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-        String requestId = request.getHeader(RequestUtils.HEADER_REQUEST_ID);
-        if (!StringUtils.hasText(requestId)) {
-            requestId = RequestUtils.generateRequestId();
+        String correlationId = request.getHeader(CorrelationConstants.HEADER_CORRELATION_ID.getValue());
+        if (!StringUtils.hasText(correlationId)) {
+            correlationId = CorrelationUtils.generateCorrelationId();
         }
-        response.setHeader(RequestUtils.HEADER_REQUEST_ID, requestId);
-        MDC.put(RequestUtils.CONTEXT_REQUEST_ID, requestId);
-        MDC.put(RequestUtils.CONTEXT_REQUEST_URL, request.getRequestURI());
-        MDC.put(RequestUtils.CONTEXT_REQUEST_METHOD, request.getMethod());
-        MDC.put(RequestUtils.CONTEXT_REQUEST_TYPE, "request");
+        response.setHeader(CorrelationConstants.HEADER_CORRELATION_ID.getValue(), correlationId);
+        MDC.put(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId);
+        MDC.put(CorrelationConstants.CONTEXT_REQUEST_URL.getValue(), request.getRequestURI());
+        MDC.put(CorrelationConstants.CONTEXT_REQUEST_METHOD.getValue(), request.getMethod());
+        MDC.put(CorrelationConstants.CONTEXT_REQUEST_TYPE.getValue(), "request");
         long start = System.currentTimeMillis();
         chain.doFilter(req, res);
-        MDC.put(RequestUtils.CONTEXT_REQUEST_TYPE, "response");
-        MDC.put(RequestUtils.CONTEXT_RESPONSE_TIME, String.valueOf(System.currentTimeMillis() - start));
-        MDC.put(RequestUtils.CONTEXT_RESPONSE_STATUS, String.valueOf(response.getStatus()));
+        MDC.put(CorrelationConstants.CONTEXT_REQUEST_TYPE.getValue(), "response");
+        MDC.put(CorrelationConstants.CONTEXT_RESPONSE_TIME.getValue(), String.valueOf(System.currentTimeMillis() - start));
+        MDC.put(CorrelationConstants.CONTEXT_RESPONSE_STATUS.getValue(), String.valueOf(response.getStatus()));
         // Log response time
         if (appLogTrace) {
             log.info(HttpStatus.valueOf(response.getStatus()).name());
         }
-        MDC.remove(RequestUtils.CONTEXT_RESPONSE_TIME);
-        MDC.remove(RequestUtils.CONTEXT_RESPONSE_STATUS);
+        MDC.remove(CorrelationConstants.CONTEXT_RESPONSE_TIME.getValue());
+        MDC.remove(CorrelationConstants.CONTEXT_RESPONSE_STATUS.getValue());
     }
 
     @Override

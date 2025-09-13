@@ -11,7 +11,14 @@ import com.demo.repo.RoleRepository;
 import com.demo.repo.UserRepository;
 import com.demo.security.jwt.JwtUtils;
 import com.demo.security.services.UserDetailsImpl;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,6 +50,12 @@ public class AuthService {
 
     @Autowired
     JwtUtils jwtUtils;
+    
+    @Value("${bezkoder.app.jwtSecret}")
+    private String jwtSecret;
+
+    @Value("${bezkoder.app.jwtExpirationMs}")
+    private int jwtExpirationMs;
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
 
@@ -50,7 +63,7 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = generateJwtTokenWithUserDetails(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
@@ -81,7 +94,7 @@ public class AuthService {
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
-        Set<String> strRoles = signUpRequest.getRole();
+        Set<String> strRoles = signUpRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
         // Default to ROLE_USER when roles are not provided or empty
@@ -94,15 +107,15 @@ public class AuthService {
             strRoles.forEach(role -> {
                 String r = role == null ? "" : role.trim().toLowerCase();
                 switch (r) {
-                    case "admin" -> {
+                    case "admin", "role_admin" -> {
                         Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(adminRole);
                     }
-                    case "mod", "moderator" -> {
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+                    case "user", "role_user" -> {
+                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
+                        roles.add(userRole);
                     }
                     default -> {
                         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
@@ -117,6 +130,24 @@ public class AuthService {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+    
+    private String generateJwtTokenWithUserDetails(Authentication authentication) {
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        return Jwts.builder()
+                .setSubject((userPrincipal.getUsername()))
+                .claim("userId", userPrincipal.getId().toString())
+                .claim("roles", userPrincipal.getAuthorities().stream()
+                        .map(authority -> authority.getAuthority())
+                        .toArray())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    
+    private Key key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
 }

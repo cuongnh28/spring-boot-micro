@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZonedDateTime;
 
-// This class for testing Kafka
 @RestController
 @RequestMapping("api/user")
 public class UserController {
@@ -22,7 +21,11 @@ public class UserController {
     @PostMapping()
     public boolean generateUser() {
         Faker faker = new Faker();
-        User user = new User(faker.name().username(), faker.internet().emailAddress(), faker.internet().password());
+        User user = new User();
+        user.setUsername(faker.name().username());
+        user.setEmail(faker.internet().emailAddress());
+        user.setPassword(faker.internet().password());
+        user.setEnabled(true);
         userKafkaProducer.writeToKafka(user);
         return true;
     }

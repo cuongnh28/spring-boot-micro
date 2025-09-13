@@ -1,6 +1,6 @@
 package com.demo.kafka;
 
-import com.demo.interceptor.KafkaTracingInterceptor;
+import com.demo.interceptor.KafkaRecordInterceptor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ public class KafkaConfig {
         factory.setConsumerFactory(requestLogConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         factory.getContainerProperties().setSyncCommits(true);
-        factory.setRecordInterceptor(new KafkaTracingInterceptor<>());
+        factory.setRecordInterceptor(new KafkaRecordInterceptor<>());
         return factory;
     }
 }

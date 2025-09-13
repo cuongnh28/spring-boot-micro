@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 public class ProductAop {
     @Before("execution(* com.demo.controller.ProductController.*(..))")
     public void beforeAdvice(JoinPoint joinPoint) {
-        System.out.println("Aop Before Controller");
+        // Log controller method execution start
     }
 
     @After("execution(* com.demo.controller.ProductController.*(..))")
     public void afterAdvice(JoinPoint joinPoint) {
-        System.out.println("Aop After Controller");
+        // Log controller method execution end
     }
 
 }

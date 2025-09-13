@@ -29,23 +29,22 @@ public class FeignErrorDecoder implements ErrorDecoder {
         HttpStatus responseStatus = HttpStatus.valueOf(response.status());
 
         if (response.body() == null) {
-            return new HttpException(responseStatus, List.of(responseStatus.getReasonPhrase()), null);
+            return new HttpException(responseStatus, List.of(responseStatus.getReasonPhrase()));
         }
 
         try {
             inputStream = response.body().asInputStream();
-            responseBody = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
-            log.info("====UlErrorDecoder.decode====");
+            responseBody = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             log.info(response.request().url());
             log.info(responseBody);
         } catch (IOException e) {
-            return new HttpException(responseStatus, List.of(responseStatus.getReasonPhrase()), null);
+            return new HttpException(responseStatus, List.of(responseStatus.getReasonPhrase()));
         }
         try {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             errorModel = mapper.readValue(responseBody, ApiError.class);
         } catch (JsonProcessingException e) {
-            return new HttpException(responseStatus, List.of(responseBody), null);
+            return new HttpException(responseStatus, List.of(responseBody));
         }
 
         return new FeignResponseException(errorModel);

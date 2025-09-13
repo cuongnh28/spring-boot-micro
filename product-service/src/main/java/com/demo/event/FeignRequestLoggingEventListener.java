@@ -4,7 +4,8 @@ import com.demo.event.dto.FeignRequestLoggingEvent;
 import com.demo.model.FeignRequestLog;
 import com.demo.repo.FeignRequestLogRepository;
 import com.demo.util.LogUtils;
-import com.demo.util.RequestUtils;
+import com.demo.constants.CorrelationConstants;
+import com.demo.util.CorrelationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,10 @@ public class FeignRequestLoggingEventListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleFeignRequest(FeignRequestLoggingEvent event) {
         try {
-            MDC.put(RequestUtils.CONTEXT_REQUEST_ID, event.getRequestId());
+            MDC.put(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), event.getCorrelationId());
             FeignRequestLog feignRequestLog = new FeignRequestLog(null, event .getMethod(),event.getUrl(), event.getQuery()
                     , event.getStatus(), event.getRequestTime(), event.getRequestHeader(), event.getPayload()
-                    , event.getResponseHeader(),  event.getResponse(), event.getCreatedDate(), event.getRequestId());
+                    , event.getResponseHeader(),  event.getResponse(), event.getCreatedDate(), event.getCorrelationId());
             //LogUtils.logJson(event);
             feignRequestLogRepository.save(feignRequestLog);
         } catch (Exception ex) {

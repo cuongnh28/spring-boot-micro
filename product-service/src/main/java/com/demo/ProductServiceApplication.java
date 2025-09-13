@@ -1,18 +1,17 @@
 package com.demo;
 
-import com.demo.logging.CommonRequestFeignConfig;
+import com.demo.logging.FeignRequestInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.annotation.EnableKafka;
 import com.demo.util.StringToDateConverter;
 
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-@EnableFeignClients(defaultConfiguration = {CommonRequestFeignConfig.class})
+@SpringBootApplication
+@EnableFeignClients(defaultConfiguration = {FeignRequestInterceptor.class})
 @Import({StringToDateConverter.class})
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
 @EnableKafka

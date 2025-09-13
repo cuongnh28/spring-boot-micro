@@ -1,7 +1,8 @@
 package com.demo.feign;
 
 import com.demo.event.dto.FeignRequestLoggingEvent;
-import com.demo.util.RequestUtils;
+import com.demo.constants.CorrelationConstants;
+import com.demo.util.CorrelationUtils;
 import com.google.gson.Gson;
 import feign.Logger;
 import feign.Request;
@@ -26,7 +27,7 @@ public class CustomFeignRequestLogging extends Logger {
 
     @Override
     protected void logRequest(String configKey, Level logLevel, Request request) {
-        // TODO document why this method is empty
+        // Request logging is handled in logAndRebufferResponse method
     }
 
     @Override
@@ -37,12 +38,12 @@ public class CustomFeignRequestLogging extends Logger {
         String query = response.request().requestTemplate().queryLine();
         query = URLDecoder.decode(query, StandardCharsets.UTF_8);
         Integer status = response.status();
-        String requestId = MDC.get(RequestUtils.CONTEXT_REQUEST_ID);
+        String correlationId = MDC.get(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue());
         Gson gson = new Gson();
         String requestHeader = response.request().headers() != null ? gson.toJson(response.request().headers()) : null;
         String responseHeader = response.headers() != null ? gson.toJson(response.headers()) : null;
         FeignRequestLoggingEvent feignEvent = new FeignRequestLoggingEvent(method, url, query, status, elapsedTime
-                , requestHeader, responseHeader, requestId);
+                , requestHeader, responseHeader, correlationId);
         byte[] requestBody = response.request().body();
         byte[] responseBody = response.body() != null ? response.body().asInputStream().readAllBytes() : null;
         feignEvent.setPayload(requestBody);

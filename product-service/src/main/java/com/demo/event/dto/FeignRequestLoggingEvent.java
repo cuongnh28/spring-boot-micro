@@ -24,10 +24,10 @@ public class FeignRequestLoggingEvent {
     private String response;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date createdDate;
-    private String requestId;
+    private String correlationId;
 
     public FeignRequestLoggingEvent(String method, String url, String query, Integer status, Long requestTime
-            , String requestHeader, String responseHeader, String requestId) {
+            , String requestHeader, String responseHeader, String correlationId) {
         this.method = method;
         this.url = url;
         this.query = query;
@@ -35,7 +35,7 @@ public class FeignRequestLoggingEvent {
         this.requestTime = requestTime;
         this.requestHeader = requestHeader;
         this.responseHeader = responseHeader;
-        this.requestId = requestId;
+        this.correlationId = correlationId;
         this.createdDate = new Date();
     }
 

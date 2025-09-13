@@ -1,0 +1,133 @@
+# Product Service Configuration
+spring:
+  application:
+    name: product-service
+  
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/product_service}
+    username: postgres
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 20
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    topic:
+      name: account-service
+      product:
+        name: product-events
+    replication:
+      factor: 3
+    partition:
+      number: 2
+    consumer:
+      group-id: kafka-user-listener
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      level:
+        concurrency: 5
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# JWT Configuration
+bezkoder:
+  app:
+    jwtSecret: ======================BezKoder=Spring===========================
+    jwtExpirationMs: 86400000
+
+# Server Configuration
+server:
+  port: 8089
+
+# Management/Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# Application Info
+info:
+  app:
+    name: Spring Boot Actuator
+    description: An explanation about Spring Boot Actuator
+    version: 1.0.0
+
+# Feign Configuration with Circuit Breaker
+feign:
+  circuitbreaker:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+      account-service:
+        connectTimeout: 3000
+        readTimeout: 8000
+        loggerLevel: full
+
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      feign:
+        registerHealthIndicator: true
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 60
+        waitDurationInOpenState: 60s
+        permittedNumberOfCallsInHalfOpenState: 5
+        slowCallRateThreshold: 60
+        slowCallDurationThreshold: 8s
+        eventConsumerBufferSize: 10
+      account-service:
+        registerHealthIndicator: true
+        slidingWindowSize: 15
+        minimumNumberOfCalls: 8
+        failureRateThreshold: 50
+        waitDurationInOpenState: 45s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 6s
+        eventConsumerBufferSize: 10
+  timelimiter:
+    instances:
+      feign:
+        timeoutDuration: 15s
+      account-service:
+        timeoutDuration: 10s
+      default:
+        timeoutDuration: 10s
+
+# Logging Configuration
+logging:
+  level:
+    com.demo: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+    io.github.resilience4j: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+

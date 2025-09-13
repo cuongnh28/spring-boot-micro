@@ -8,8 +8,8 @@ import feign.Client;
 import feign.Feign;
 import feign.Logger;
 import feign.QueryMapEncoder;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.TrustStrategy;
+// import org.apache.http.conn.ssl.NoopHostnameVerifier;
+// import org.apache.http.conn.ssl.TrustStrategy;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,15 +27,15 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
 //@Configuration // Disabled to avoid duplicate bean names; using CommonFeignConfig instead
 public class ProductFeignConfig {
 
-    @Bean
-    public Client getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
-                .build();
+    // @Bean
+    // public Client getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    //     TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+    //     SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+    //             .loadTrustMaterial(null, acceptingTrustStrategy)
+    //             .build();
 
-        return new Client.Default(sslContext.getSocketFactory(), NoopHostnameVerifier.INSTANCE);
-    }
+    //     return new Client.Default(sslContext.getSocketFactory(), NoopHostnameVerifier.INSTANCE);
+    // }
 
     @Bean
     public CustomFeignRequestLogging customFeignRequestLogging(ApplicationEventPublisher publisher) {
