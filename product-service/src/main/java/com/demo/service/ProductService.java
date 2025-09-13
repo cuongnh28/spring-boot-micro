@@ -4,19 +4,17 @@ import com.demo.dto.ProductEvent;
 import com.demo.dto.ProductRequest;
 import com.demo.dto.ProductSearchRequest;
 import com.demo.dto.ProductUpdateRequest;
-import com.demo.dto.User;
 import com.demo.exception.NotFoundException;
 import com.demo.feign.UserFeignClient;
 import com.demo.kafka.config.ProductKafkaProducer;
 import com.demo.model.Product;
 import com.demo.repo.ProductRepo;
+import com.demo.util.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,8 @@ public class ProductService {
     private ProductKafkaProducer productKafkaProducer;
 
     public List<Product> getProductsByUserId(long creatorId) {
-        User user = userFeignClient.getAccountInfo(creatorId);
+        // Validate that the user exists before returning products
+        userFeignClient.getAccountInfo(creatorId);
         return productRepo.findAllByCreatorId(creatorId);
     }
 
@@ -70,8 +69,8 @@ public class ProductService {
 
     public Product createProduct(ProductRequest productRequest) {
         // Get current user from JWT
-        Long currentUserId = getCurrentUserId();
-        String currentUsername = getCurrentUsername();
+        Long currentUserId = AuthUtils.getCurrentUserId();
+        String currentUsername = AuthUtils.getCurrentUsername();
         
         // Create new product
         Product product = new Product();
@@ -98,9 +97,9 @@ public class ProductService {
 
     public Product updateProduct(Long productId, ProductUpdateRequest updateRequest) {
         // Get current user from JWT
-        Long currentUserId = getCurrentUserId();
-        String currentUsername = getCurrentUsername();
-        boolean isAdmin = isCurrentUserAdmin();
+        Long currentUserId = AuthUtils.getCurrentUserId();
+        String currentUsername = AuthUtils.getCurrentUsername();
+        boolean isAdmin = AuthUtils.isCurrentUserAdmin();
         
         // Find product and check permissions
         Optional<Product> productOpt = productRepo.findById(productId);
@@ -141,28 +140,4 @@ public class ProductService {
         return updatedProduct;
     }
 
-    private Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getDetails() instanceof Long) {
-            return (Long) authentication.getDetails();
-        }
-        throw new RuntimeException("User not authenticated");
-    }
-
-    private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getName() != null) {
-            return authentication.getName();
-        }
-        throw new RuntimeException("User not authenticated");
-    }
-
-    private boolean isCurrentUserAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getAuthorities() != null) {
-            return authentication.getAuthorities().stream()
-                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-        }
-        return false;
-    }
 }
