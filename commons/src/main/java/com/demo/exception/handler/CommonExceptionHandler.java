@@ -117,7 +117,7 @@ public class CommonExceptionHandler {
 
     private HttpHeaders header(){
         HttpHeaders customHeader = new HttpHeaders();
-        customHeader.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        customHeader.setContentType(MediaType.APPLICATION_JSON);
         return customHeader;
     }
 

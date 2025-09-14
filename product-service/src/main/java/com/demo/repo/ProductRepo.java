@@ -16,11 +16,11 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
 
     List<Product> findAllByCreatorId(Long creatorId);
 
-    // Search methods
+    // Search methods - Simplified to avoid PostgreSQL issues
     @Query("SELECT p FROM Product p WHERE " +
            "(:id IS NULL OR p.id = :id) AND " +
-           "(:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
-           "(:description IS NULL OR LOWER(p.description) LIKE LOWER(CONCAT('%', :description, '%'))) AND " +
+           "(:name IS NULL OR p.name LIKE %:name%) AND " +
+           "(:description IS NULL OR p.description LIKE %:description%) AND " +
            "(:creatorId IS NULL OR p.creatorId = :creatorId) AND " +
            "(:minPrice IS NULL OR p.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR p.price <= :maxPrice)")

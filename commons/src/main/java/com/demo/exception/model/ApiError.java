@@ -1,7 +1,10 @@
 package com.demo.exception.model;
 
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public class ApiError {
     private final int statusCode;
     private final List<String> messages;
@@ -16,11 +19,4 @@ public class ApiError {
         this.messages = List.of(message);
     }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public List<String> getMessages() {
-        return messages;
-    }
 }

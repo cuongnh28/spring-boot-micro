@@ -5,6 +5,7 @@ import com.demo.dto.ProductRequest;
 import com.demo.dto.ProductSearchRequest;
 import com.demo.dto.ProductUpdateRequest;
 import com.demo.exception.NotFoundException;
+import com.demo.exception.ForbiddenException;
 import com.demo.feign.UserFeignClient;
 import com.demo.kafka.config.ProductKafkaProducer;
 import com.demo.model.Product;
@@ -110,7 +111,7 @@ public class ProductService {
         Product product = productOpt.get();
         // Allow update if user is admin OR if user is the creator
         if (!isAdmin && !product.getCreatorId().equals(currentUserId)) {
-            throw new RuntimeException("You can only update your own products or you need admin role");
+            throw new ForbiddenException("You can only update your own products or you need admin role");
         }
         
         // Update fields if provided

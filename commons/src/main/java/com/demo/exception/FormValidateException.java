@@ -1,17 +1,17 @@
 package com.demo.exception;
 
-import com.demo.exception.model.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class FormValidateException extends ApplicationException {
 
-    public FormValidateException(String... messages) {
-        super(messages);
+    public FormValidateException() {
+        super();
     }
 
-    public FormValidateException(ErrorCode... errors) {
-        super(errors);
+    public FormValidateException(String message) {
+        super(message);
     }
+
 
     @Override
     public HttpStatus getHttpStatus() {

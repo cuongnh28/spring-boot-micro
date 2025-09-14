@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateRequest {
 
-  @NotBlank
-  @Size(max = 50)
-  @Email
+  @NotBlank(message = "Email is required")
+  @Size(max = 50, message = "Email must not exceed 50 characters")
+  @Email(message = "Email must be valid")
   private String email;
 
 }

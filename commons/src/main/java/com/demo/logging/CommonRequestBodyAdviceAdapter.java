@@ -20,10 +20,10 @@ import java.util.Map;
 @ControllerAdvice
 public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
 
-    @Value("${management.endpoints.web.base-path:x}")
-    private String managementEndpoint;
+    @Value("${management.endpoints.web.base-path:/actuator}")
+    private String actuatorBasePath;
 
-    @Value("${application.logging.request:true}")
+    @Value("${app.logging.request:true}")
     private boolean appLogRequest;
 
     @Autowired
@@ -33,7 +33,7 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     public boolean supports(MethodParameter methodParameter, Type type,
                             Class<? extends HttpMessageConverter<?>> aClass) {
         String uri = httpServletRequest.getRequestURI();
-        return !uri.startsWith(managementEndpoint);
+        return !uri.startsWith(actuatorBasePath);
     }
 
     @Override
@@ -41,12 +41,12 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
                                 MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
         if(appLogRequest) {
-            Map<String, Object> logData = new HashMap();
+            Map<String, Object> logData = new HashMap<>();
             if(httpServletRequest.getQueryString() != null) {
-                logData.put("parameters", httpServletRequest.getQueryString());
+                logData.put("query_params", httpServletRequest.getQueryString());
             }
-            logData.put("payload", body);
-            log.info("payload", StructuredArguments.entries(logData));
+            logData.put("request_body", body);
+            log.info("Request body received", StructuredArguments.entries(logData));
         }
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
     }
@@ -54,10 +54,13 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     @Override
     public Object handleEmptyBody(@Nullable Object body, HttpInputMessage inputMessage, MethodParameter parameter,
                                   Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        Map<String, Object> logData = new HashMap();
-        if(httpServletRequest.getQueryString() != null) {
-            logData.put("parameters", httpServletRequest.getQueryString());
-            log.info("payload", StructuredArguments.entries(logData));
+        if(appLogRequest) {
+            Map<String, Object> logData = new HashMap<>();
+            if(httpServletRequest.getQueryString() != null) {
+                logData.put("query_params", httpServletRequest.getQueryString());
+            }
+            logData.put("request_body", "empty");
+            log.info("Empty request body received", StructuredArguments.entries(logData));
         }
         return body;
     }

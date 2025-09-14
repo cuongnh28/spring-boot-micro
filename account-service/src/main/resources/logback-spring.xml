@@ -80,9 +80,12 @@
     <logger name="org.springframework.web" level="DEBUG" />
     <logger name="org.springframework.security" level="DEBUG" />
 
-    <!-- Kafka loggers -->
+    <!-- Kafka loggers - Reduce noise from polling -->
     <logger name="org.springframework.kafka" level="INFO" />
+    <logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" level="WARN" />
+    <logger name="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" level="WARN" />
     <logger name="org.apache.kafka" level="WARN" />
+    <logger name="org.apache.kafka.clients.consumer.KafkaConsumer" level="WARN" />
 
     <!-- Database loggers -->
     <logger name="org.hibernate" level="WARN" />
@@ -93,4 +96,7 @@
     <logger name="org.apache.catalina" level="WARN" />
     <logger name="org.apache.coyote" level="WARN" />
     <logger name="org.apache.tomcat" level="WARN" />
+    <logger name="org.springframework.boot.actuate" level="WARN" />
+    <logger name="org.springframework.boot.autoconfigure" level="WARN" />
+    <logger name="org.springframework.context" level="WARN" />
 </configuration>

@@ -23,7 +23,7 @@ public class FeignErrorDecoder implements ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-        ApiError errorModel;
+        ApiError apiError;
         InputStream inputStream;
         String responseBody;
         HttpStatus responseStatus = HttpStatus.valueOf(response.status());
@@ -42,11 +42,11 @@ public class FeignErrorDecoder implements ErrorDecoder {
         }
         try {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            errorModel = mapper.readValue(responseBody, ApiError.class);
+            apiError = mapper.readValue(responseBody, ApiError.class);
         } catch (JsonProcessingException e) {
             return new HttpException(responseStatus, List.of(responseBody));
         }
 
-        return new FeignResponseException(errorModel);
+        return new FeignResponseException(apiError);
     }
 }

@@ -48,9 +48,9 @@ application:
       auto-startup: true
 
 # JWT Configuration
-bezkoder:
+auth:
   app:
-    jwtSecret: ======================BezKoder=Spring===========================
+    jwtSecret: ======================Auth=Spring===========================
     jwtExpirationMs: 86400000
 
 # Server Configuration
@@ -74,11 +74,26 @@ info:
     description: User account management service
     version: 1.0.0
 
+# Application Configuration
+app:
+  async:
+    core-pool-size: 3
+    max-pool-size: 10
+    queue-capacity: 50
+    thread-name-prefix: account-async-
+    keep-alive-seconds: 60
+    await-termination-seconds: 30
+  logging:
+    request: true
+    response: true
+    trace: true
+
 # Logging Configuration
 logging:
   level:
     com.demo: DEBUG
     org.springframework.kafka: DEBUG
+    org.springframework.scheduling: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

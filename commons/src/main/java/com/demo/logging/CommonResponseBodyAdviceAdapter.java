@@ -25,10 +25,10 @@ import java.util.Map;
 @ControllerAdvice
 public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Object> {
 
-    @Value("${management.endpoints.web.base-path:x}")
-    private String managementEndpoint;
+    @Value("${management.endpoints.web.base-path:/actuator}")
+    private String actuatorBasePath;
 
-    @Value("${application.logging.response:true}")
+    @Value("${app.logging.response:true}")
     private boolean appLogResponse;
 
     @Autowired
@@ -38,7 +38,7 @@ public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
     public boolean supports(MethodParameter methodParameter,
                             Class<? extends HttpMessageConverter<?>> aClass) {
         String uri = httpServletRequest.getRequestURI();
-        return !uri.startsWith(managementEndpoint);
+        return !uri.startsWith(actuatorBasePath);
     }
 
     @Override
@@ -51,11 +51,11 @@ public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
 
         if (serverHttpRequest instanceof ServletServerHttpRequest
                 && serverHttpResponse instanceof ServletServerHttpResponse) {
-            Map<String, Object> logData = new HashMap();
-            logData.put("response", response);
+            Map<String, Object> logData = new HashMap<>();
+            logData.put("response_body", response);
             HttpServletResponse servletResponse = ((ServletServerHttpResponse) serverHttpResponse).getServletResponse();
             if(appLogResponse || HttpStatus.OK.value() != servletResponse.getStatus()) {
-                log.info("response", StructuredArguments.entries(logData));
+                log.info("Response body sent", StructuredArguments.entries(logData));
             }
         }
         return response;

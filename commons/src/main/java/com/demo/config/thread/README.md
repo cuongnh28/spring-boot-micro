@@ -25,25 +25,45 @@ Task decorator that preserves context across async operations:
 - Restores context in the new thread
 - Cleans up context after execution
 
-### 5. TaskPoolConfiguration
-Configures thread pool with context preservation:
-- Configurable pool sizes via application properties
-- Uses CommonContextTaskDecorator for context preservation
-- Proper shutdown handling
+### 5. AsyncConfig
+Configuration class that enables async operations with context preservation:
+- `@EnableAsync` annotation enables async processing
+- Custom `TaskExecutor` with configurable thread pool
+- Automatic context preservation via `CommonContextTaskDecorator`
 
-### 6. ThreadContextAsyncExecutor
-Utility class for executing async operations with context preservation.
+### 6. AsyncUtils
+Utility class for easy async operations with context preservation:
+- `runAsync()` - Execute Runnable asynchronously
+- `supplyAsync()` - Execute Supplier asynchronously
+- Automatic context preservation
 
 ## Usage
 
-### Basic Async Operations
+### Using @Async Annotation
 ```java
 @Service
 public class MyService {
     
+    @Async
     public CompletableFuture<String> processAsync(String data) {
-        return ThreadContextAsyncExecutor.supplyAsync(() -> {
-            // Context is automatically preserved here
+        // Context is automatically preserved by CommonContextTaskDecorator
+        String correlationId = CommonContextHolder.getCorrelationId();
+        String userId = CommonContextHolder.getUserId();
+        
+        // Your async logic here
+        return CompletableFuture.completedFuture("Processed: " + data);
+    }
+}
+```
+
+### Using AsyncUtils
+```java
+@Service
+public class MyService {
+    
+    public CompletableFuture<String> processWithAsyncUtils(String data) {
+        return AsyncUtils.supplyAsync(() -> {
+            // Context is automatically preserved
             String correlationId = CommonContextHolder.getCorrelationId();
             String userId = CommonContextHolder.getUserId();
             
@@ -70,13 +90,16 @@ CommonContextHolder.resetContext();
 ```
 
 ### Configuration Properties
-Add these to your `application.properties`:
-```properties
-# Thread pool configuration
-app.thread-pool.core-size=5
-app.thread-pool.max-size=20
-app.thread-pool.queue-capacity=100
-app.thread-pool.thread-name-prefix=microservice-async-
+Add these to your `application.yml`:
+```yaml
+app:
+  async:
+    core-pool-size: 5
+    max-pool-size: 20
+    queue-capacity: 100
+    thread-name-prefix: microservice-async-
+    keep-alive-seconds: 60
+    await-termination-seconds: 30
 ```
 
 ## Benefits
@@ -86,14 +109,19 @@ app.thread-pool.thread-name-prefix=microservice-async-
 3. **Logging**: Structured logging with consistent correlation IDs
 4. **Debugging**: Easier to trace requests through async operations
 5. **Security**: User context is preserved for authorization checks
+6. **Performance**: Configurable thread pools for optimal performance
+7. **Reliability**: Graceful shutdown and error handling
 
-## Integration with Existing Code
+## Current Status
 
-The thread configuration is automatically applied when you use:
-- `@Async` annotations (if configured with the custom executor)
-- `ThreadContextAsyncExecutor` methods
-- Any custom async operations using the configured task executor
+✅ **Fully Configured and Ready to Use**
+
+The async infrastructure is now properly configured and actively used in the application:
+- `@Async` annotations work with context preservation
+- `AsyncUtils` provides convenient async operations
+- Thread pools are configurable via application properties
+- Context is automatically preserved across all async operations
 
 ## Example Service
 
-See `ThreadContextExampleService` for a complete example of how to use these components.
+See `AsyncExampleService` for complete examples of how to use async operations with context preservation.

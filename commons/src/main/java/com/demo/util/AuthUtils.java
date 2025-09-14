@@ -2,6 +2,7 @@ package com.demo.util;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.demo.exception.UnauthorizedException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +27,7 @@ public class AuthUtils {
         if (authentication != null && authentication.getDetails() instanceof Long) {
             return (Long) authentication.getDetails();
         }
-        throw new RuntimeException("User not authenticated");
+        throw new UnauthorizedException("User not authenticated");
     }
 
     /**
@@ -40,7 +41,7 @@ public class AuthUtils {
         if (authentication != null && authentication.getName() != null) {
             return authentication.getName();
         }
-        throw new RuntimeException("User not authenticated");
+        throw new UnauthorizedException("User not authenticated");
     }
 
     /**

@@ -51,10 +51,10 @@ public class AuthService {
     @Autowired
     JwtUtils jwtUtils;
     
-    @Value("${bezkoder.app.jwtSecret}")
+    @Value("${auth.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${bezkoder.app.jwtExpirationMs}")
+    @Value("${auth.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import feign.Logger;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.okhttp.OkHttpClient;
@@ -23,19 +22,10 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 public class CommonFeignConfig {
 
     @Bean
-    public Logger.Level feignLoggerLevel() {
-        return Logger.Level.BASIC;
-    }
-
-    // Request.Options bean removed due to deprecation warnings
-    // Timeout configuration can be handled via application properties
-    // Circuit breaker configuration is handled via application.yml
-
-    @Bean
     public Decoder feignDecoder() {
         HttpMessageConverter<Object> jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper());
         ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
-        return new ResponseEntityDecoder(new SpringDecoder(objectFactory, null));
+        return new ResponseEntityDecoder(new SpringDecoder(objectFactory));
     }
 
     private ObjectMapper objectMapper() {

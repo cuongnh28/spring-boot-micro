@@ -1,9 +1,0 @@
-#Config circuit breaker
-slidingWindowType: COUNT_BASED
-slidingWindowSize: 10
-permittedNumber 0fCalls InHalf0penState: 5
-waitDurationIn 0penState: 10s
-failureRateThreshold : 50
-minimumNumber0fCalls: 5
-slowCalLRateThreshold : 70
-slowCalLDurationThreshold: 5000ms

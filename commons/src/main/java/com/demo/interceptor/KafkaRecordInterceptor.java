@@ -14,14 +14,23 @@ import java.util.Map;
 @Slf4j
 public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {
 
+    public KafkaRecordInterceptor() {
+        log.info("KafkaRecordInterceptor instantiated - ready to intercept Kafka messages");
+    }
+
     @Override
     public ConsumerRecord<K, V> intercept(ConsumerRecord<K, V> consumerRecord, Consumer<K, V> consumer) {
+        log.info("KafkaRecordInterceptor.intercept() called for topic: {}, partition: {}, offset: {}", 
+                consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
+        
         MDC.put(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), CorrelationUtils.generateCorrelationId());
         MDC.put("topic", consumerRecord.topic());
         MDC.put("partition", String.valueOf(consumerRecord.partition()));
         MDC.put("offset", String.valueOf(consumerRecord.offset()));
         MDC.put("key", String.valueOf(consumerRecord.key()));
-        log.info("payload",StructuredArguments.entries(Map.of("payload", consumerRecord.value())));
+        log.info("Kafka message intercepted: topic={}, partition={}, offset={}, key={}, payload={}", 
+                consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset(), 
+                consumerRecord.key(), consumerRecord.value());
         return consumerRecord;
     }
 

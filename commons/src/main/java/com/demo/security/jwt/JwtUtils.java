@@ -19,10 +19,10 @@ import org.springframework.security.core.GrantedAuthority;
 public class JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-  @Value("${bezkoder.app.jwtSecret}")
+  @Value("${auth.app.jwtSecret}")
   private String jwtSecret;
 
-  @Value("${bezkoder.app.jwtExpirationMs}")
+  @Value("${auth.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
   private Key key() {
@@ -36,8 +36,6 @@ public class JwtUtils {
     // Extract user ID and roles from the principal
     String userId = null;
     if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-      org.springframework.security.core.userdetails.UserDetails userDetails = 
-          (org.springframework.security.core.userdetails.UserDetails) principal;
       // Try to get user ID from the principal if it has a getId method
       try {
         java.lang.reflect.Method getIdMethod = principal.getClass().getMethod("getId");

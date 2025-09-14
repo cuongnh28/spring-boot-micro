@@ -17,33 +17,33 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "username"),
-                @UniqueConstraint(columnNames = "email")
-        })
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 20)
+    @NotBlank(message = "Username is required")
+    @Size(max = 20, message = "Username must not exceed 20 characters")
+    @Column(length = 20)
     private String username;
 
-    @NotBlank
-    @Size(max = 50)
-    @Email
+    @NotBlank(message = "Email is required")
+    @Size(max = 50, message = "Email must not exceed 50 characters")
+    @Email(message = "Email must be valid")
+    @Column(length = 50)
     private String email;
 
-    @NotBlank
-    @Size(max = 120)
+    @NotBlank(message = "Password is required")
+    @Size(max = 120, message = "Password must not exceed 120 characters")
+    @Column(length = 120)
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     public User(String username, String email, String password) {

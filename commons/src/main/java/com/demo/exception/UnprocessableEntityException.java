@@ -1,17 +1,17 @@
 package com.demo.exception;
 
-import com.demo.exception.model.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class UnprocessableEntityException extends ApplicationException {
 
-    public UnprocessableEntityException(String... messages) {
-        super(messages);
+    public UnprocessableEntityException() {
+        super();
     }
 
-    public UnprocessableEntityException(ErrorCode... errors) {
-        super(errors);
+    public UnprocessableEntityException(String message) {
+        super(message);
     }
+
 
     @Override
     public HttpStatus getHttpStatus() {

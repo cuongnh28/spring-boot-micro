@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Kafka Testing Controller - sends test messages to trigger KafkaRecordInterceptor
+ */
 @RestController
 @RequestMapping("api/user")
 public class UserController {
@@ -18,6 +21,9 @@ public class UserController {
     @Autowired
     UserKafkaProducer userKafkaProducer;
 
+    /**
+     * Send a random user to Kafka for testing
+     */
     @PostMapping()
     public boolean generateUser() {
         Faker faker = new Faker();
@@ -30,9 +36,6 @@ public class UserController {
         return true;
     }
 
-    @GetMapping()
-    public ZonedDateTime getZone() {
-        return ZonedDateTime.now();
-    }
+
 
 }

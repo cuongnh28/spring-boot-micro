@@ -4,22 +4,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Client;
 import feign.Feign;
-import feign.Logger;
 import feign.QueryMapEncoder;
-// import org.apache.http.conn.ssl.NoopHostnameVerifier;
-// import org.apache.http.conn.ssl.TrustStrategy;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-
-import javax.net.ssl.SSLContext;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
@@ -37,10 +25,6 @@ public class ProductFeignConfig {
     //     return new Client.Default(sslContext.getSocketFactory(), NoopHostnameVerifier.INSTANCE);
     // }
 
-    @Bean
-    public CustomFeignRequestLogging customFeignRequestLogging(ApplicationEventPublisher publisher) {
-        return new CustomFeignRequestLogging(publisher);
-    }
 
 //    @Bean
 //    Logger.Level feignLoggerLevel() {

@@ -46,9 +46,9 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 # JWT Configuration
-bezkoder:
+auth:
   app:
-    jwtSecret: ======================BezKoder=Spring===========================
+    jwtSecret: ======================Auth=Spring===========================
     jwtExpirationMs: 86400000
 
 # Server Configuration
@@ -120,12 +120,27 @@ resilience4j:
       default:
         timeoutDuration: 10s
 
+# Application Configuration
+app:
+  async:
+    core-pool-size: 5
+    max-pool-size: 20
+    queue-capacity: 100
+    thread-name-prefix: product-async-
+    keep-alive-seconds: 60
+    await-termination-seconds: 30
+  logging:
+    request: true
+    response: true
+    trace: true
+
 # Logging Configuration
 logging:
   level:
     com.demo: DEBUG
     org.springframework.cloud.openfeign: DEBUG
     io.github.resilience4j: DEBUG
+    org.springframework.scheduling: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
