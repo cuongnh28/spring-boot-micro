@@ -27,3 +27,8 @@ public class ProductEventController {
         return String.format("Product event processed for user %d with action: %s", userId, action);
     }
 }
+
+
+
+
+

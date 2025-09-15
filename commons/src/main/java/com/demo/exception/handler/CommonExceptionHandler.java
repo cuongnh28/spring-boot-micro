@@ -72,7 +72,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDenied(Exception ex, WebRequest request) {
         HttpStatus httpStatus = HttpStatus.FORBIDDEN;
-        ApiError errorModel = new ApiError(httpStatus.value(), "Access Denied");
+        ApiError errorModel = new ApiError(httpStatus.value(), "Forbidden");
         return new ResponseEntity<>(errorModel, header(), httpStatus);
     }
 

@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.demo.exception.model.ApiError;
+import com.demo.exception.UnauthorizedException;
+import com.demo.exception.ForbiddenException;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,6 +28,8 @@ public class WebSecurityConfig {
     @Autowired
     private AuthTokenFilter authTokenFilter;
 
+    // Inline handlers to keep things simple (no extra classes)
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
@@ -36,8 +42,22 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
         http.cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authEx) -> {
+                            UnauthorizedException ue = new UnauthorizedException("Unauthorized");
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            mapper.writeValue(response.getOutputStream(), new ApiError(401, ue.getMessages()));
+                        })
+                        .accessDeniedHandler((request, response, accessEx) -> {
+                            ForbiddenException fe = new ForbiddenException("Forbidden");
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            mapper.writeValue(response.getOutputStream(), new ApiError(403, fe.getMessages()));
+                        }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()

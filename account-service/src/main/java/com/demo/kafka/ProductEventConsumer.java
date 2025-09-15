@@ -103,3 +103,8 @@ public class ProductEventConsumer {
         userService.updateUserProductStats(productEvent.getCreatorId(), "DELETED");
     }
 }
+
+
+
+
+

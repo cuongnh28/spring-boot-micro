@@ -1,6 +1,8 @@
 package com.demo.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.argument.StructuredArguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public boolean supports(MethodParameter methodParameter, Type type,
                             Class<? extends HttpMessageConverter<?>> aClass) {
@@ -45,7 +50,13 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
             if(httpServletRequest.getQueryString() != null) {
                 logData.put("query_params", httpServletRequest.getQueryString());
             }
-            logData.put("request_body", body);
+            String requestBodyAsString;
+            try {
+                requestBodyAsString = objectMapper.writeValueAsString(body);
+            } catch (JsonProcessingException e) {
+                requestBodyAsString = String.valueOf(body);
+            }
+            logData.put("request_body", requestBodyAsString);
             log.info("Request body received", StructuredArguments.entries(logData));
         }
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);

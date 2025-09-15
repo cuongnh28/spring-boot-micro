@@ -1,6 +1,7 @@
 package com.demo.config.feign;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.demo.exception.HttpException;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class FeignErrorDecoder implements ErrorDecoder {

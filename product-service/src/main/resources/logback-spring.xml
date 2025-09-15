@@ -1,56 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Console Appender with JSON formatting -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
-                <timestamp />
-                <logLevel />
-                <mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
-                <context /> <!--Outputs entries from logback's context -->
-                <loggerName />
-                <pattern>
-                    <pattern>
-                        {
-                        "message": "#tryJson{%message}"
-                        }
-                    </pattern>
-                </pattern>
-                <arguments /> <!--or through StructuredArguments -->
-                <stackTrace>
-                    <fieldName>stackTrace</fieldName>
-                    <throwableConverter
-                            class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
-                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
-                        <rootCauseFirst>true</rootCauseFirst>
-                    </throwableConverter>
-                </stackTrace>
-            </providers>
-        </encoder>
-    </appender>
+                <!-- ISO8601 timestamp -->
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                    <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
+                </timestamp>
 
-    <!-- File Appender for persistent logging -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/product-service.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/product-service.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>3GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp />
                 <logLevel />
+                <loggerName />
+                <threadName />
                 <mdc />
-                <context />
-                <loggerName />
+                <arguments />
+
+                <!-- Log message -->
                 <pattern>
-                    <pattern>
-                        {
-                        "message": "#tryJson{%message}"
-                        }
-                    </pattern>
+                    {
+                    "message":"#tryJson{%message}"
+                    }
                 </pattern>
+
+                <!-- Stack trace -->
                 <stackTrace>
                     <fieldName>stackTrace</fieldName>
                     <throwableConverter
@@ -59,49 +31,26 @@
                         <rootCauseFirst>true</rootCauseFirst>
                     </throwableConverter>
                 </stackTrace>
+
+                <!-- Custom fixed fields -->
+                <globalCustomFields>{"service":"${spring.application.name}"}</globalCustomFields>
             </providers>
+
         </encoder>
     </appender>
 
-    <!-- Root logger configuration -->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
     </root>
 
-    <!-- Application specific loggers -->
-    <logger name="com.demo" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
-    </logger>
-
-    <!-- Spring Framework loggers -->
+    <!-- Tinh chỉnh noise log -->
     <logger name="org.springframework" level="INFO" />
-    <logger name="org.springframework.web" level="DEBUG" />
-    <logger name="org.springframework.security" level="DEBUG" />
-
-    <!-- Feign and Circuit Breaker loggers -->
-    <logger name="org.springframework.cloud.openfeign" level="DEBUG" />
-    <logger name="io.github.resilience4j" level="DEBUG" />
-    <logger name="io.github.resilience4j.circuitbreaker" level="DEBUG" />
-
-    <!-- Kafka loggers - Reduce noise from polling -->
-    <logger name="org.springframework.kafka" level="INFO" />
-    <logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" level="WARN" />
-    <logger name="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" level="WARN" />
+    <logger name="org.hibernate.SQL" level="WARN" />
+    <!-- Reduce Kafka listener noise -->
+    <logger name="org.springframework.kafka" level="ERROR" />
+    <logger name="org.springframework.kafka.listener" level="ERROR" />
+    <logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" level="ERROR" />
+    <logger name="org.springframework.kafka.listener.ConcurrentMessageListenerContainer" level="ERROR" />
     <logger name="org.apache.kafka" level="WARN" />
     <logger name="org.apache.kafka.clients.consumer.KafkaConsumer" level="WARN" />
-
-    <!-- Database loggers -->
-    <logger name="org.hibernate" level="WARN" />
-    <logger name="org.hibernate.SQL" level="DEBUG" />
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
-
-    <!-- Reduce noise from other libraries -->
-    <logger name="org.apache.catalina" level="WARN" />
-    <logger name="org.apache.coyote" level="WARN" />
-    <logger name="org.apache.tomcat" level="WARN" />
-    <logger name="org.springframework.boot.actuate" level="WARN" />
-    <logger name="org.springframework.boot.autoconfigure" level="WARN" />
-    <logger name="org.springframework.context" level="WARN" />
 </configuration>

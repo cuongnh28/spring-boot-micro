@@ -1,6 +1,5 @@
-package com.demo.config;
+package com.demo.config.thread;
 
-import com.demo.config.thread.CommonContextTaskDecorator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @Configuration
 @EnableAsync
-public class AsyncConfig implements AsyncConfigurer {
+public class ThreadAsyncConfig implements AsyncConfigurer {
 
     @Value("${app.async.core-pool-size:5}")
     private int corePoolSize;

@@ -31,7 +31,7 @@ spring:
       product:
         name: product-events
     replication:
-      factor: 3
+      factor: 1
     partition:
       number: 2
     consumer:
@@ -138,6 +138,12 @@ app:
 logging:
   level:
     com.demo: DEBUG
+    org.springframework.kafka: INFO
+    org.springframework.kafka.listener: ERROR
+    org.springframework.kafka.listener.KafkaMessageListenerContainer: ERROR
+    org.springframework.kafka.listener.ConcurrentMessageListenerContainer: ERROR
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.consumer.KafkaConsumer: WARN
     org.springframework.cloud.openfeign: DEBUG
     io.github.resilience4j: DEBUG
     org.springframework.scheduling: DEBUG

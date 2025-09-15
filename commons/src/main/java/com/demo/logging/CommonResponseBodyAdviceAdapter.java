@@ -1,6 +1,8 @@
 package com.demo.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.argument.StructuredArguments;
@@ -34,6 +36,9 @@ public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     public boolean supports(MethodParameter methodParameter,
                             Class<? extends HttpMessageConverter<?>> aClass) {
@@ -52,7 +57,13 @@ public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
         if (serverHttpRequest instanceof ServletServerHttpRequest
                 && serverHttpResponse instanceof ServletServerHttpResponse) {
             Map<String, Object> logData = new HashMap<>();
-            logData.put("response_body", response);
+            String responseBodyAsString;
+            try {
+                responseBodyAsString = objectMapper.writeValueAsString(response);
+            } catch (JsonProcessingException e) {
+                responseBodyAsString = String.valueOf(response);
+            }
+            logData.put("response_body", responseBodyAsString);
             HttpServletResponse servletResponse = ((ServletServerHttpResponse) serverHttpResponse).getServletResponse();
             if(appLogResponse || HttpStatus.OK.value() != servletResponse.getStatus()) {
                 log.info("Response body sent", StructuredArguments.entries(logData));
