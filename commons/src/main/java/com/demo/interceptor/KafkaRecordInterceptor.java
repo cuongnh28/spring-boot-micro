@@ -21,9 +21,6 @@ public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {
 
     @Override
     public ConsumerRecord<K, V> intercept(ConsumerRecord<K, V> consumerRecord, Consumer<K, V> consumer) {
-        log.info("KafkaRecordInterceptor.intercept() called for topic: {}, partition: {}, offset: {}", 
-                consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
-        
         String correlationId = null;
         Header header = consumerRecord.headers().lastHeader(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue());
         if (header != null && header.value() != null) {
@@ -40,9 +37,13 @@ public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {
         MDC.put("partition", String.valueOf(consumerRecord.partition()));
         MDC.put("offset", String.valueOf(consumerRecord.offset()));
         MDC.put("key", String.valueOf(consumerRecord.key()));
-        log.info("Kafka message intercepted: topic={}, partition={}, offset={}, key={}, payload={}", 
-                consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset(), 
-                consumerRecord.key(), consumerRecord.value());
+        // Grep-friendly info with payload stringified (not top-level JSON)
+        String payloadStr = String.valueOf(consumerRecord.value());
+        // Avoid JSON-looking braces so logback tryJson doesn't swallow the prefix
+        payloadStr = payloadStr.replace('{', '(').replace('}', ')');
+        log.info("Kafka message intercepted: topic={}, partition={}, offset={}, key={}, payload={}",
+                consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset(),
+                consumerRecord.key(), payloadStr);
         return consumerRecord;
     }
 
