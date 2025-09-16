@@ -16,7 +16,6 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
 
     List<Product> findAllByCreatorId(Long creatorId);
 
-    // Search methods - Simplified to avoid PostgreSQL issues
     @Query("SELECT p FROM Product p WHERE " +
            "(:id IS NULL OR p.id = :id) AND " +
            "(:name IS NULL OR p.name LIKE %:name%) AND " +
@@ -32,12 +31,9 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
                                 @Param("maxPrice") BigDecimal maxPrice,
                                 Pageable pageable);
 
-    // Simple search by name
     List<Product> findByNameContainingIgnoreCase(String name);
 
-    // Search by price range
     List<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
 
-    // Search by user
     List<Product> findByCreatorId(Long creatorId);
 }

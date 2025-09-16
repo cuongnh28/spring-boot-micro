@@ -8,7 +8,7 @@ public class HeaderUtils {
     public static HttpHeaders createJwtHeader(String token) {
         HttpHeaders headers = new HttpHeaders();
         String correlationId = CorrelationUtils.currentCorrelationId();
-        headers.add(CorrelationConstants.HEADER_CORRELATION_ID.getValue(), correlationId);
+        headers.add(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId);
         headers.add(HeaderName.JWT, token);
         return headers;
     }

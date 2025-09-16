@@ -32,11 +32,11 @@ public class MDCLoggerFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-        String correlationId = request.getHeader(CorrelationConstants.HEADER_CORRELATION_ID.getValue());
+        String correlationId = request.getHeader(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue());
         if (!StringUtils.hasText(correlationId)) {
             correlationId = CorrelationUtils.generateCorrelationId();
         }
-        response.setHeader(CorrelationConstants.HEADER_CORRELATION_ID.getValue(), correlationId);
+        response.setHeader(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId);
         MDC.put(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId);
         MDC.put(CorrelationConstants.CONTEXT_REQUEST_URL.getValue(), request.getRequestURI());
         MDC.put(CorrelationConstants.CONTEXT_REQUEST_METHOD.getValue(), request.getMethod());

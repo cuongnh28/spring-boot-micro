@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum CorrelationConstants {
-    HEADER_CORRELATION_ID("X-Correlation-ID"),
     CONTEXT_CORRELATION_ID("correlation_id"),
     CONTEXT_REQUEST_URL("url"),
     CONTEXT_REQUEST_METHOD("request_method"),

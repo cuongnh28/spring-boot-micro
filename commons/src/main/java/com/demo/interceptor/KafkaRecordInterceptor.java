@@ -1,15 +1,16 @@
 package com.demo.interceptor;
 
 import com.demo.constants.CorrelationConstants;
+import com.demo.context.CommonContextHolder;
 import com.demo.util.CorrelationUtils;
 import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.argument.StructuredArguments;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.header.Header;
 import org.slf4j.MDC;
 import org.springframework.kafka.listener.RecordInterceptor;
 
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {
@@ -23,7 +24,18 @@ public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {
         log.info("KafkaRecordInterceptor.intercept() called for topic: {}, partition: {}, offset: {}", 
                 consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
         
-        MDC.put(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), CorrelationUtils.generateCorrelationId());
+        String correlationId = null;
+        Header header = consumerRecord.headers().lastHeader(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue());
+        if (header != null && header.value() != null) {
+            correlationId = new String(header.value(), StandardCharsets.UTF_8);
+        }
+        if (correlationId == null || correlationId.isBlank()) {
+            correlationId = CommonContextHolder.getCorrelationId();
+        }
+        if (correlationId == null || correlationId.isBlank()) {
+            correlationId = CorrelationUtils.generateCorrelationId();
+        }
+        MDC.put(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId);
         MDC.put("topic", consumerRecord.topic());
         MDC.put("partition", String.valueOf(consumerRecord.partition()));
         MDC.put("offset", String.valueOf(consumerRecord.offset()));
