@@ -1,13 +1,17 @@
 package com.demo.exception.model;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class ApiError {
-    private final int statusCode;
-    private final List<String> messages;
+    private int statusCode;
+    private List<String> messages;
 
     public ApiError(int statusCode, List<String> messages) {
         this.statusCode = statusCode;
