@@ -18,6 +18,7 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.demo.exception.UnprocessableEntityException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -79,15 +80,11 @@ public class AuthService {
 
     public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .unprocessableEntity()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+            throw new UnprocessableEntityException("Username is already taken");
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .unprocessableEntity()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+            throw new UnprocessableEntityException("Email is already in use");
         }
 
         User user = new User(signUpRequest.getUsername(),

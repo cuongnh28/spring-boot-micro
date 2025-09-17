@@ -37,10 +37,10 @@ public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {
         MDC.put("partition", String.valueOf(consumerRecord.partition()));
         MDC.put("offset", String.valueOf(consumerRecord.offset()));
         MDC.put("key", String.valueOf(consumerRecord.key()));
-        // Grep-friendly info with payload stringified (not top-level JSON)
+        MDC.put("event", "kafka_message_intercepted");
+        // Grep-friendly info with payload captured in MDC (keep original content)
         String payloadStr = String.valueOf(consumerRecord.value());
-        // Avoid JSON-looking braces so logback tryJson doesn't swallow the prefix
-        payloadStr = payloadStr.replace('{', '(').replace('}', ')');
+        MDC.put("payload", payloadStr);
         log.info("Kafka message intercepted: topic={}, partition={}, offset={}, key={}, payload={}",
                 consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset(),
                 consumerRecord.key(), payloadStr);
