@@ -8,11 +8,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByUsername(String username);
 
-  @Query("select u from User u left join fetch u.roles where u.username = :username")
+  @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username = :username")
   Optional<User> findWithRolesByUsername(@Param("username") String username);
 
   Boolean existsByUsername(String username);

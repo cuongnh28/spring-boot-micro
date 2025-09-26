@@ -18,11 +18,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+ 
+
 @Service
+@Slf4j
 @Transactional
 public class ProductService {
 
@@ -69,6 +77,7 @@ public class ProductService {
     }
 
     public Product createProduct(ProductRequest productRequest) {
+        
         // Get current user from JWT
         Long currentUserId = AuthUtils.getCurrentUserId();
         String currentUsername = AuthUtils.getCurrentUsername();
@@ -97,6 +106,7 @@ public class ProductService {
     }
 
     public Product updateProduct(Long productId, ProductUpdateRequest updateRequest) {
+        
         // Get current user from JWT
         Long currentUserId = AuthUtils.getCurrentUserId();
         String currentUsername = AuthUtils.getCurrentUsername();

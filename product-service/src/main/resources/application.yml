@@ -65,6 +65,13 @@ management:
     health:
       show-details: always
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
 # Application Info
 info:
   app:
@@ -72,10 +79,8 @@ info:
     description: An explanation about Spring Boot Actuator
     version: 1.0.0
 
-# Feign Configuration with Circuit Breaker
+# Feign Configuration
 feign:
-  circuitbreaker:
-    enabled: true
   client:
     config:
       default:
@@ -86,39 +91,6 @@ feign:
         connectTimeout: 3000
         readTimeout: 8000
         loggerLevel: full
-
-# Resilience4j Circuit Breaker Configuration
-resilience4j:
-  circuitbreaker:
-    instances:
-      feign:
-        registerHealthIndicator: true
-        slidingWindowSize: 20
-        minimumNumberOfCalls: 10
-        failureRateThreshold: 60
-        waitDurationInOpenState: 60s
-        permittedNumberOfCallsInHalfOpenState: 5
-        slowCallRateThreshold: 60
-        slowCallDurationThreshold: 8s
-        eventConsumerBufferSize: 10
-      account-service:
-        registerHealthIndicator: true
-        slidingWindowSize: 15
-        minimumNumberOfCalls: 8
-        failureRateThreshold: 50
-        waitDurationInOpenState: 45s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: 6s
-        eventConsumerBufferSize: 10
-  timelimiter:
-    instances:
-      feign:
-        timeoutDuration: 15s
-      account-service:
-        timeoutDuration: 10s
-      default:
-        timeoutDuration: 10s
 
 # Application Configuration
 app:

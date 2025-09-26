@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.demo.exception.model.ApiError;
-import com.demo.exception.UnauthorizedException;
-import com.demo.exception.ForbiddenException;
+ 
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
@@ -27,6 +29,16 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthTokenFilter authTokenFilter;
+
+    @Bean
+    public CustomAccessDeniedHandler customAccessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
+
+    @Bean
+    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
+    }
 
     // Inline handlers to keep things simple (no extra classes)
 
@@ -42,22 +54,11 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         http.cors(cors -> cors.disable())
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authEx) -> {
-                            UnauthorizedException ue = new UnauthorizedException("Unauthorized");
-                            response.setStatus(401);
-                            response.setContentType("application/json");
-                            mapper.writeValue(response.getOutputStream(), new ApiError(401, ue.getMessages()));
-                        })
-                        .accessDeniedHandler((request, response, accessEx) -> {
-                            ForbiddenException fe = new ForbiddenException("Forbidden");
-                            response.setStatus(403);
-                            response.setContentType("application/json");
-                            mapper.writeValue(response.getOutputStream(), new ApiError(403, fe.getMessages()));
-                        }))
+                        .authenticationEntryPoint(customAuthenticationEntryPoint())
+                        .accessDeniedHandler(customAccessDeniedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
@@ -66,6 +67,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product").permitAll() // Only GET endpoint for public access
                         .requestMatchers("/api/product/search").permitAll() // Search endpoint for public access
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -4,6 +4,11 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 public class HttpException extends ApplicationException {
     private final HttpStatus httpStatus;
 

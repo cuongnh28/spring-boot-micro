@@ -5,7 +5,12 @@ import feign.RequestTemplate;
 import com.demo.constants.CorrelationConstants;
 import com.demo.util.CorrelationUtils;
 
-public class FeignRequestInterceptor implements RequestInterceptor {
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
+public class OpenFeignRequestInterceptor implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate requestTemplate) {
         String correlationId = CorrelationUtils.currentCorrelationId();

@@ -41,6 +41,28 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.4.0</version>
+                <configuration>
+                    <header>${project.basedir}/HEADER.java</header>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <strictCheck>true</strictCheck>
+                    <inceptionYear>2025</inceptionYear>
+                    <organizationName>Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)</organizationName>
+                    <licenseName>none</licenseName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

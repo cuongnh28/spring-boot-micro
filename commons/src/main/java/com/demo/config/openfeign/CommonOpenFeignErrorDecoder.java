@@ -1,12 +1,11 @@
-package com.demo.config.feign;
+package com.demo.config.openfeign;
 
+import com.demo.exception.FeignResponseException;
+import com.demo.exception.HttpException;
+import com.demo.exception.model.ApiError;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.demo.exception.HttpException;
-import com.demo.exception.FeignResponseException;
-import com.demo.exception.model.ApiError;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 @Slf4j
-public class FeignErrorDecoder implements ErrorDecoder {
+public class CommonOpenFeignErrorDecoder implements ErrorDecoder {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override

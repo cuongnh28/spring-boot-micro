@@ -6,14 +6,19 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.security.Key;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 @Component
 public class JwtUtils {
@@ -41,18 +46,15 @@ public class JwtUtils {
         java.lang.reflect.Method getIdMethod = principal.getClass().getMethod("getId");
         Object id = getIdMethod.invoke(principal);
         userId = id != null ? id.toString() : null;
-      } catch (Exception e) {
+      } catch (Exception ignored) {
       }
     }
     
-    return Jwts.builder()
-        .setSubject(username)
-        .claim("userId", userId)
-        .claim("roles", authentication.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .toArray())
-        .setIssuedAt(new Date())
-        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+    return Jwts.builder().subject(username)
+            .claim("userId", userId)
+            .claim("roles", authentication.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toArray()).issuedAt(new Date()).expiration(new Date((new Date()).getTime() + jwtExpirationMs))
         .signWith(key(), SignatureAlgorithm.HS256)
         .compact();
   }

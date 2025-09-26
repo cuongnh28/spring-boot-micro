@@ -13,6 +13,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
@@ -28,6 +33,8 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         objectMapper.writeValue(response.getOutputStream(), body);
     }
 }
+
+
 
 
 

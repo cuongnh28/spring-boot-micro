@@ -1,10 +1,9 @@
-package com.demo.config.feign;
+package com.demo.config.openfeign;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
@@ -18,13 +17,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Configuration
-public class CommonFeignConfig {
+public class CommonOpenFeignConfig {
 
     @Bean
     public Decoder feignDecoder() {
-        HttpMessageConverter<Object> jacksonConverter = new MappingJackson2HttpMessageConverter(customObjectMapper());
-        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
+        HttpMessageConverter<Object> objectHttpMessageConverter = new MappingJackson2HttpMessageConverter(customObjectMapper());
+        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(objectHttpMessageConverter);
         return new ResponseEntityDecoder(new SpringDecoder(objectFactory));
     }
 
@@ -46,6 +50,6 @@ public class CommonFeignConfig {
 
     @Bean
     public ErrorDecoder errorDecoder() {
-        return new FeignErrorDecoder();
+        return new CommonOpenFeignErrorDecoder();
     }
 }

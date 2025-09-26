@@ -1,8 +1,6 @@
 package com.demo.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.argument.StructuredArguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,11 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Slf4j
 @ControllerAdvice
 public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
@@ -25,14 +28,8 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     @Value("${management.endpoints.web.base-path:/actuator}")
     private String actuatorBasePath;
 
-    @Value("${app.logging.request:true}")
-    private boolean appLogRequest;
-
     @Autowired
     HttpServletRequest httpServletRequest;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type type,
@@ -45,35 +42,23 @@ public class CommonRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage,
                                 MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
-        if(appLogRequest) {
-            Map<String, Object> logData = new HashMap<>();
-            if(httpServletRequest.getQueryString() != null) {
-                logData.put("query_params", httpServletRequest.getQueryString());
-            }
-            String requestBodyAsString;
-            try {
-                requestBodyAsString = objectMapper.writeValueAsString(body);
-            } catch (JsonProcessingException e) {
-                requestBodyAsString = String.valueOf(body);
-            }
-            logData.put("request_body", requestBodyAsString);
-            log.info("Request body received", StructuredArguments.entries(logData));
+        Map<String, Object> logMap = new HashMap<>();
+        if(httpServletRequest.getQueryString() != null) {
+            logMap.put("parameters", httpServletRequest.getQueryString());
         }
+        logMap.put("payload", body);
+        log.info("request", StructuredArguments.entries(logMap));
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
     }
 
     @Override
     public Object handleEmptyBody(@Nullable Object body, HttpInputMessage inputMessage, MethodParameter parameter,
                                   Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        if(appLogRequest) {
-            Map<String, Object> logData = new HashMap<>();
-            if(httpServletRequest.getQueryString() != null) {
-                logData.put("query_params", httpServletRequest.getQueryString());
-            }
-            logData.put("request_body", "empty");
-            log.info("Empty request body received", StructuredArguments.entries(logData));
+        Map<String, Object> logMap = new HashMap<>();
+        if(httpServletRequest.getQueryString() != null) {
+            logMap.put("parameters", httpServletRequest.getQueryString());
+            log.info("request", StructuredArguments.entries(logMap));
         }
         return body;
     }
-
 }

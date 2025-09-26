@@ -1,6 +1,7 @@
 package com.demo.service;
 
 import com.demo.enums.ERole;
+import com.demo.exception.UnprocessableEntityException;
 import com.demo.model.Role;
 import com.demo.model.User;
 import com.demo.payload.request.LoginRequest;
@@ -12,13 +13,10 @@ import com.demo.repo.UserRepository;
 import com.demo.security.jwt.JwtUtils;
 import com.demo.security.services.UserDetailsImpl;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import java.security.Key;
-import java.util.Date;
+ 
 import org.springframework.beans.factory.annotation.Autowired;
-import com.demo.exception.UnprocessableEntityException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,9 +28,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.security.Key;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 @Service
 public class AuthService {
@@ -51,6 +56,8 @@ public class AuthService {
 
     @Autowired
     JwtUtils jwtUtils;
+    
+    
     
     @Value("${auth.app.jwtSecret}")
     private String jwtSecret;
@@ -79,6 +86,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> registerUser(SignupRequest signUpRequest) {
+        
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             throw new UnprocessableEntityException("Username is already taken");
         }
@@ -109,11 +117,6 @@ public class AuthService {
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(adminRole);
                     }
-                    case "user", "role_user" -> {
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                    }
                     default -> {
                         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
@@ -131,15 +134,17 @@ public class AuthService {
     
     private String generateJwtTokenWithUserDetails(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + jwtExpirationMs);
         return Jwts.builder()
-                .setSubject((userPrincipal.getUsername()))
+                .subject(userPrincipal.getUsername())
                 .claim("userId", userPrincipal.getId().toString())
                 .claim("roles", userPrincipal.getAuthorities().stream()
                         .map(authority -> authority.getAuthority())
                         .toArray())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key(), SignatureAlgorithm.HS256)
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key())
                 .compact();
     }
     

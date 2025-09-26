@@ -1,6 +1,7 @@
 package com.demo.kafka;
 
 import com.demo.dto.ProductEvent;
+import com.demo.enums.EventType;
 import com.demo.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 @Component
 @NoArgsConstructor
@@ -54,18 +60,23 @@ public class ProductEventConsumer {
 
     private void processProductEvent(ProductEvent productEvent) {
         try {
-            switch (productEvent.getEventType()) {
-                case "CREATED":
+            EventType type = productEvent.getEventType();
+            if (type == null) {
+                log.warn("Unknown product event type: null");
+                return;
+            }
+            switch (type) {
+                case CREATED:
                     handleProductCreated(productEvent);
                     break;
-                case "UPDATED":
+                case UPDATED:
                     handleProductUpdated(productEvent);
                     break;
-                case "DELETED":
+                case DELETED:
                     handleProductDeleted(productEvent);
                     break;
                 default:
-                    log.warn("Unknown product event type: {}", productEvent.getEventType());
+                    log.warn("Unknown product event type: {}", type);
             }
         } catch (Exception e) {
             log.error("Error processing product event type {}: {}", 
@@ -80,7 +91,7 @@ public class ProductEventConsumer {
                 productEvent.getProductId());
         
         // Update user statistics or send notifications
-        userService.updateUserProductStats(productEvent.getCreatorId(), "CREATED");
+        userService.updateUserProductStats(productEvent.getCreatorId(), EventType.CREATED.name());
     }
 
     private void handleProductUpdated(ProductEvent productEvent) {
@@ -90,7 +101,7 @@ public class ProductEventConsumer {
                 productEvent.getProductId());
         
         // Update user statistics
-        userService.updateUserProductStats(productEvent.getCreatorId(), "UPDATED");
+        userService.updateUserProductStats(productEvent.getCreatorId(), EventType.UPDATED.name());
     }
 
     private void handleProductDeleted(ProductEvent productEvent) {
@@ -100,9 +111,10 @@ public class ProductEventConsumer {
                 productEvent.getProductId());
         
         // Update user statistics
-        userService.updateUserProductStats(productEvent.getCreatorId(), "DELETED");
+        userService.updateUserProductStats(productEvent.getCreatorId(), EventType.DELETED.name());
     }
 }
+
 
 
 

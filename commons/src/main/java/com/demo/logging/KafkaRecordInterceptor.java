@@ -1,4 +1,4 @@
-package com.demo.interceptor;
+package com.demo.logging;
 
 import com.demo.constants.CorrelationConstants;
 import com.demo.context.CommonContextHolder;
@@ -11,6 +11,11 @@ import org.slf4j.MDC;
 import org.springframework.kafka.listener.RecordInterceptor;
 
 import java.nio.charset.StandardCharsets;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 @Slf4j
 public class KafkaRecordInterceptor<K, V>  implements RecordInterceptor<K, V> {

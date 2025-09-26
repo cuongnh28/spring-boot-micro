@@ -11,6 +11,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Map;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Slf4j
 public class CommonContextTaskDecorator implements TaskDecorator {
     

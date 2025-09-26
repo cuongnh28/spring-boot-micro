@@ -4,6 +4,11 @@ import com.demo.exception.model.ApiError;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Getter
 public class FeignResponseException extends ApplicationException {
 

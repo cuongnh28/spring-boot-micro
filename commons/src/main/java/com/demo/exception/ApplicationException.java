@@ -6,6 +6,11 @@ import org.springframework.http.HttpStatus;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Getter
 public abstract class ApplicationException extends RuntimeException {
     public abstract HttpStatus getHttpStatus();

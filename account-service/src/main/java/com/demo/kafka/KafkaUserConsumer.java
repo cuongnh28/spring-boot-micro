@@ -14,12 +14,16 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
 public class KafkaUserConsumer {
-
 
     @Autowired
     private UserService userService;

@@ -13,6 +13,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
+/**
  * Configuration for asynchronous operations with context preservation.
  * 
  * This configuration enables async operations and provides a custom TaskExecutor

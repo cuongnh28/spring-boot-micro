@@ -1,15 +1,12 @@
 package com.demo.logging;
 
 import jakarta.servlet.http.HttpServletRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.argument.StructuredArguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -22,22 +19,21 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 
 @Slf4j
 @ControllerAdvice
-public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Object> {
+public class CommonResponseBodyLogger implements ResponseBodyAdvice<Object> {
 
     @Value("${management.endpoints.web.base-path:/actuator}")
     private String actuatorBasePath;
 
-    @Value("${app.logging.response:true}")
-    private boolean appLogResponse;
-
     @Autowired
     HttpServletRequest httpServletRequest;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Override
     public boolean supports(MethodParameter methodParameter,
@@ -56,18 +52,10 @@ public class CommonResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
 
         if (serverHttpRequest instanceof ServletServerHttpRequest
                 && serverHttpResponse instanceof ServletServerHttpResponse) {
-            Map<String, Object> logData = new HashMap<>();
-            String responseBodyAsString;
-            try {
-                responseBodyAsString = objectMapper.writeValueAsString(response);
-            } catch (JsonProcessingException e) {
-                responseBodyAsString = String.valueOf(response);
-            }
-            logData.put("response_body", responseBodyAsString);
+            Map<String, Object> logMap = new HashMap<>();
+            logMap.put("response", response);
             HttpServletResponse servletResponse = ((ServletServerHttpResponse) serverHttpResponse).getServletResponse();
-            if(appLogResponse || HttpStatus.OK.value() != servletResponse.getStatus()) {
-                log.info("Response body sent", StructuredArguments.entries(logData));
-            }
+            log.info("response", StructuredArguments.entries(logMap));
         }
         return response;
     }

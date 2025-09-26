@@ -16,6 +16,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,7 +48,7 @@ public class ProductKafkaProducer {
             if (correlationId == null || correlationId.isBlank()) {
                 correlationId = CorrelationUtils.generateCorrelationId();
             }
-            ProducerRecord<String, ProductEvent> record = new ProducerRecord<>(productTopic, productEvent.getEventType(), productEvent);
+            ProducerRecord<String, ProductEvent> record = new ProducerRecord<>(productTopic, productEvent.getEventType() == null ? null : productEvent.getEventType().name(), productEvent);
             record.headers().add(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             kafkaTemplate.send(record);
             log.info("Product event sent successfully to topic: {}", productTopic);

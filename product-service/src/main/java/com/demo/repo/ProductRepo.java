@@ -11,6 +11,11 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Repository
 public interface ProductRepo extends JpaRepository<Product, Long> {
 

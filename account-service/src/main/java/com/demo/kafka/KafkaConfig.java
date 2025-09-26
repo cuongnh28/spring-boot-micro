@@ -1,6 +1,6 @@
 package com.demo.kafka;
 
-import com.demo.interceptor.KafkaRecordInterceptor;
+import com.demo.logging.KafkaRecordInterceptor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,11 @@ import org.springframework.kafka.listener.ContainerProperties;
 
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 @Configuration
 public class KafkaConfig {

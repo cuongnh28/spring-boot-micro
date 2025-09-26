@@ -11,6 +11,11 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
+/**
  * Example service demonstrating async operations with context preservation.
  * 
  * This service shows how to use @Async annotations and AsyncUtils

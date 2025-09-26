@@ -5,6 +5,11 @@ import org.slf4j.MDC;
 
 import java.util.UUID;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 public class CorrelationUtils {
 
     private CorrelationUtils() {

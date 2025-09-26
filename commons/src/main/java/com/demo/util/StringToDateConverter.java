@@ -7,6 +7,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 public class StringToDateConverter implements Converter<String, Date> {
     private static final List<String> datePatterns = Arrays.asList(
             "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
@@ -21,8 +26,7 @@ public class StringToDateConverter implements Converter<String, Date> {
     public Date convert(String source) {
         for(String pattern : datePatterns){
             try{
-                Date result = new SimpleDateFormat(pattern).parse(source);
-                return result;
+                return new SimpleDateFormat(pattern).parse(source);
             }
             catch(Exception e){
                 continue;

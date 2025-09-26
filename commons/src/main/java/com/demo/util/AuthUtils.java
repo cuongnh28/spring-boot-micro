@@ -6,6 +6,11 @@ import com.demo.exception.UnauthorizedException;
 import org.springframework.stereotype.Component;
 
 /**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
+/**
  * Utility class for authentication-related operations.
  * Provides methods to extract user information from Spring Security context.
  */

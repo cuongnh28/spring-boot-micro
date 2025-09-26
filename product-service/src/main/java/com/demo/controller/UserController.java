@@ -8,14 +8,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 import java.time.ZonedDateTime;
+
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
 
 /**
  * Kafka Testing Controller - sends test messages to trigger KafkaRecordInterceptor
  */
 @RestController
 @RequestMapping("api/user")
+@Tag(name = "user-controller", description = "Utility endpoint to generate random users and send to Kafka")
 public class UserController {
 
     @Autowired
@@ -25,6 +33,7 @@ public class UserController {
      * Send a random user to Kafka for testing
      */
     @PostMapping()
+    @Operation(summary = "Generate and send user to Kafka", description = "Creates a random user and publishes to Kafka for testing")
     public boolean generateUser() {
         Faker faker = new Faker();
         User user = new User();

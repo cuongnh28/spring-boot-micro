@@ -2,6 +2,11 @@ package com.demo.config.thread;
 
 import lombok.Data;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 @Data
 public class DefaultCommonContext implements CommonContext {
     private String correlationId;

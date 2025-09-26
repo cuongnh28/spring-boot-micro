@@ -10,6 +10,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
+/**
  * Utility class for asynchronous operations with context preservation.
  * 
  * This class provides convenient methods for executing async operations
@@ -114,6 +119,8 @@ public class AsyncUtils {
         return CompletableFuture.failedFuture(throwable);
     }
 }
+
+
 
 
 

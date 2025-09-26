@@ -12,6 +12,11 @@ import java.util.Map;
 
 import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 //@Configuration // Disabled to avoid duplicate bean names; using CommonFeignConfig instead
 public class ProductFeignConfig {
 

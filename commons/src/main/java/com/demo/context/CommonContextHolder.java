@@ -12,6 +12,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.annotation.Nullable;
 
+/**
+ * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
+ */
+
+
 public abstract class CommonContextHolder {
     private static final ThreadLocal<CommonContext> COMMON_CONTEXT_HOLDER =
             new NamedThreadLocal<>("Common context");
