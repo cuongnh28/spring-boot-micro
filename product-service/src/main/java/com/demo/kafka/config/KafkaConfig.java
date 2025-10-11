@@ -1,4 +1,4 @@
-package com.demo.kafka;
+package com.demo.kafka.config;
 
 import com.demo.kafka.interceptor.KafkaRecordInterceptor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

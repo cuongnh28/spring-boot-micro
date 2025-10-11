@@ -23,3 +23,4 @@ public class FormValidateException extends ApplicationException {
         return HttpStatus.BAD_REQUEST;
     }
 }
+

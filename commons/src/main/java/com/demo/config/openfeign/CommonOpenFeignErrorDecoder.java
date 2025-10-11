@@ -55,3 +55,4 @@ public class CommonOpenFeignErrorDecoder implements ErrorDecoder {
         return new FeignResponseException(apiError);
     }
 }
+

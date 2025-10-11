@@ -10,11 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.kafka.annotation.EnableKafka;
 import com.demo.util.StringToDateConverter;
 
-/**
- * @author Vito Nguyen (<a href="https://github.com/cuongnh28">...</a>)
- */
-
-
 @SpringBootApplication
 @EnableFeignClients(defaultConfiguration = {OpenFeignRequestInterceptor.class})
 @Import({StringToDateConverter.class, CommonRequestBodyLogger.class, CommonResponseBodyLogger.class})

@@ -22,3 +22,4 @@ public interface UserFeignClient {
     User getAccountInfo(@PathVariable Long id);
 
 }
+

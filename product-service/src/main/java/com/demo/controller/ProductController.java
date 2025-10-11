@@ -37,6 +37,13 @@ public class ProductController {
         return productService.getProductsByUserId(userId);
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Get current user's products", description = "Return all products created by the authenticated user")
+    @PreAuthorize("isAuthenticated()")
+    public List<Product> getMyProducts() {
+        return productService.getMyProducts();
+    }
+
     @GetMapping("/search")
     @Operation(summary = "Search products", description = "Filter by id/name/description/creator/prices with pagination")
     public ResponseEntity<Page<Product>> searchProducts(ProductSearchRequest searchRequest) {
@@ -63,3 +70,4 @@ public class ProductController {
     }
 
 }
+

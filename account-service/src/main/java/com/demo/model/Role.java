@@ -27,3 +27,4 @@ public class Role {
   private ERole name;
 
 }
+

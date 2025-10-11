@@ -44,6 +44,8 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        interceptor.classes: com.demo.kafka.interceptor.KafkaProducerInterceptor
 
 # JWT Configuration
 auth:

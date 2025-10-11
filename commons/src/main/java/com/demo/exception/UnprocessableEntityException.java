@@ -23,3 +23,4 @@ public class UnprocessableEntityException extends ApplicationException {
         return HttpStatus.UNPROCESSABLE_ENTITY;
     }
 }
+

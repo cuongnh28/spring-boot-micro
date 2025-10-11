@@ -1,8 +1,11 @@
 package com.demo.controller;
 
+import com.demo.constants.CorrelationConstants;
 import com.demo.dto.User;
 import com.demo.kafka.config.UserKafkaProducer;
+import com.demo.util.CorrelationUtils;
 import com.github.javafaker.Faker;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,3 +51,4 @@ public class UserController {
 
 
 }
+

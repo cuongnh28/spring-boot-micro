@@ -4,13 +4,14 @@ import com.demo.dto.ProductEvent;
 import com.demo.dto.ProductRequest;
 import com.demo.dto.ProductSearchRequest;
 import com.demo.dto.ProductUpdateRequest;
-import com.demo.exception.NotFoundException;
 import com.demo.exception.ForbiddenException;
+import com.demo.exception.NotFoundException;
 import com.demo.feign.UserFeignClient;
 import com.demo.kafka.config.ProductKafkaProducer;
 import com.demo.model.Product;
 import com.demo.repo.ProductRepo;
 import com.demo.util.AuthUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +47,12 @@ public class ProductService {
         // Validate that the user exists before returning products
         userFeignClient.getAccountInfo(creatorId);
         return productRepo.findAllByCreatorId(creatorId);
+    }
+
+    public List<Product> getMyProducts() {
+        // Get current user from JWT
+        Long currentUserId = AuthUtils.getCurrentUserId();
+        return productRepo.findAllByCreatorId(currentUserId);
     }
 
     public Page<Product> searchProducts(ProductSearchRequest searchRequest) {
@@ -152,3 +158,4 @@ public class ProductService {
     }
 
 }
+

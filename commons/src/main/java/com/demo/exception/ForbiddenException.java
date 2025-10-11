@@ -23,3 +23,4 @@ public class ForbiddenException extends ApplicationException {
         return HttpStatus.FORBIDDEN;
     }
 }
+

@@ -26,3 +26,4 @@ public class FeignResponseException extends ApplicationException {
         return this.status;
     }
 }
+

@@ -14,13 +14,7 @@
                 <threadName />
                 <mdc />
                 <arguments />
-
-                <!-- Log message -->
-                <pattern>
-                    {
-                    "message":"#tryJson{%message}"
-                    }
-                </pattern>
+                <message />
 
                 <!-- Stack trace -->
                 <stackTrace>

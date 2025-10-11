@@ -22,3 +22,4 @@ public class NotFoundException extends ApplicationException {
         return HttpStatus.NOT_FOUND;
     }
 }
+

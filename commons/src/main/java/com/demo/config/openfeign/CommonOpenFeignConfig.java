@@ -53,3 +53,4 @@ public class CommonOpenFeignConfig {
         return new CommonOpenFeignErrorDecoder();
     }
 }
+

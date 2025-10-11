@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,9 +35,8 @@ public class UserKafkaProducer {
     @Value("${spring.kafka.partition.number:1}")
     private int partitionNumber;
 
-    @Async
     public void writeToKafka(User user) {
-        log.info("Info: {}", user);
+        log.info("Sending user: {}", user);
         kafkaTemplate.send(topic, "cuong", user);
     }
 
@@ -49,3 +47,4 @@ public class UserKafkaProducer {
     }
 
 }
+

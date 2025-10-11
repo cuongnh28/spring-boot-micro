@@ -15,3 +15,4 @@ public interface CommonContext extends Serializable {
     void setUserId(String userId);
     void setUsername(String username);
 }
+

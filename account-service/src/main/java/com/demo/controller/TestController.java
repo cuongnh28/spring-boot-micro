@@ -45,3 +45,4 @@ public class TestController {
     return "Kafka test endpoint - this will trigger the interceptor when messages are consumed";
   }
 }
+

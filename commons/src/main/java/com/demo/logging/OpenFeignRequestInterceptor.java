@@ -17,3 +17,4 @@ public class OpenFeignRequestInterceptor implements RequestInterceptor {
         requestTemplate.header(CorrelationConstants.CONTEXT_CORRELATION_ID.getValue(), correlationId);
     }
 }
+

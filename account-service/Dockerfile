@@ -20,4 +20,6 @@ LABEL authors="cuongnh"
 
 COPY --from=build /app/account-service/target/*.jar app.jar
 EXPOSE 8088
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+# Debug port
+EXPOSE 5005
+ENTRYPOINT ["java","-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005","-jar","/app/app.jar"]

@@ -52,11 +52,12 @@ public class CommonResponseBodyLogger implements ResponseBodyAdvice<Object> {
 
         if (serverHttpRequest instanceof ServletServerHttpRequest
                 && serverHttpResponse instanceof ServletServerHttpResponse) {
-            Map<String, Object> logMap = new HashMap<>();
-            logMap.put("response", response);
             HttpServletResponse servletResponse = ((ServletServerHttpResponse) serverHttpResponse).getServletResponse();
-            log.info("response", StructuredArguments.entries(logMap));
+            log.info("Response body: Status={}, Response={}", 
+                    servletResponse.getStatus(),
+                    response);
         }
         return response;
     }
 }
+

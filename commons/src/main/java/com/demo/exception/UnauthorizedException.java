@@ -23,3 +23,4 @@ public class UnauthorizedException extends ApplicationException {
         return HttpStatus.UNAUTHORIZED;
     }
 }
+

@@ -42,23 +42,22 @@ public class CommonRequestBodyLogger extends RequestBodyAdviceAdapter {
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage,
                                 MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
-        Map<String, Object> logMap = new HashMap<>();
-        if(httpServletRequest.getQueryString() != null) {
-            logMap.put("parameters", httpServletRequest.getQueryString());
-        }
-        logMap.put("payload", body);
-        log.info("request", StructuredArguments.entries(logMap));
+        log.info("Request body: URI={}, QueryString={}, Payload={}", 
+                httpServletRequest.getRequestURI(),
+                httpServletRequest.getQueryString(),
+                body);
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
     }
 
     @Override
     public Object handleEmptyBody(@Nullable Object body, HttpInputMessage inputMessage, MethodParameter parameter,
                                   Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        Map<String, Object> logMap = new HashMap<>();
         if(httpServletRequest.getQueryString() != null) {
-            logMap.put("parameters", httpServletRequest.getQueryString());
-            log.info("request", StructuredArguments.entries(logMap));
+            log.info("Request empty body: URI={}, QueryString={}", 
+                    httpServletRequest.getRequestURI(),
+                    httpServletRequest.getQueryString());
         }
         return body;
     }
 }
+

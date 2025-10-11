@@ -42,3 +42,4 @@ public interface ProductRepo extends JpaRepository<Product, Long> {
 
     List<Product> findByCreatorId(Long creatorId);
 }
+
